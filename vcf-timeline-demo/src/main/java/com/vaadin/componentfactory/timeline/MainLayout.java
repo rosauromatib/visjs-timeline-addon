@@ -1,8 +1,10 @@
 package com.vaadin.componentfactory.timeline;
 
+import com.vaadin.componentfactory.timeline.model.GroupItem;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.RouterLink;
 
 public class MainLayout extends AppLayout {
@@ -31,10 +33,10 @@ public class MainLayout extends AppLayout {
     final RouterLink groupItemsExample =
             new RouterLink("Group Items ", GroupItemsExample.class);
 
-    final VerticalLayout menuLayout = new VerticalLayout(readonlyEmptyExample, addEmptyItemsExample,
-        resizeItems, dndItems, tooltipsExample, classNameExample, readonlyExample,
-        updateItemContentExample, zoomOptionsExample, overlappExample, tooltipOnUpdateExample, groupItemsExample);
-//    final VerticalLayout menuLayout = new VerticalLayout(groupItemsExample);
+//    final VerticalLayout menuLayout = new VerticalLayout(readonlyEmptyExample, addEmptyItemsExample,
+//        resizeItems, dndItems, tooltipsExample, classNameExample, readonlyExample,
+//        updateItemContentExample, zoomOptionsExample, overlappExample, tooltipOnUpdateExample, groupItemsExample);
+    final VerticalLayout menuLayout = new VerticalLayout(groupItemsExample);
     addToDrawer(menuLayout);
     addToNavbar(drawerToggle);
   }

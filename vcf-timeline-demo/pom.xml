@@ -18,12 +18,16 @@
     </organization>
 
     <properties>
-        <vaadin.version>14.6.8</vaadin.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>17</java.version>
+        <vaadin.version>24.1.0</vaadin.version>
+        <selenium.version>4.8.3</selenium.version>
+        <!--        <maven.compiler.source>3.9.2</maven.compiler.source>-->
+        <!--        <maven.compiler.target>3.9.2</maven.compiler.target>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -117,9 +121,15 @@
         <dependency>
           <groupId>javax.servlet</groupId>
           <artifactId>javax.servlet-api</artifactId>
-          <version>3.1.0</version>
-     	</dependency>        
-        
+          <version>4.0.1</version>
+     	</dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-renderer-flow</artifactId>
+            <version>24.1.0</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -139,7 +149,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.15.v20190215</version>
+                <version>11.0.15</version>
                 <configuration>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
                     <stopKey>${project.artifactId}</stopKey>
@@ -165,7 +175,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.8</version>
+                <version>1.6.13</version>
                 <configuration>
                     <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
                 </configuration>

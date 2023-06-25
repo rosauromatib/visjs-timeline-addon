@@ -3,6 +3,7 @@ package com.vaadin.componentfactory.timeline;
 import com.vaadin.componentfactory.timeline.model.GroupItem;
 import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
@@ -13,6 +14,9 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.LitRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
+import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.router.Route;
 
 import java.time.LocalDateTime;
@@ -90,9 +94,9 @@ public class GroupItemsExample extends Div {
                 GroupItem groupItem105 = new GroupItem(105, "Oceania", true, 2);
                 GroupItem groupItem106 = new GroupItem(106, "Africa", true, 2);
 
-                List<GroupItem> groupItems = Arrays.asList(groupItem1243, groupItem1525, groupItem1624, groupItem2076,
-                                groupItem1345, groupItem2078, groupItem1826, groupItem2107, groupItem10, groupItem1,
-                                groupItem2, groupItem3, groupItem4, groupItem5, groupItem6, groupItem100, groupItem101,
+                List<GroupItem> groupItems = Arrays.asList(groupItem10, groupItem1,groupItem1243, groupItem1525, groupItem1624, groupItem2076,
+                        groupItem1345, groupItem2078, groupItem1826, groupItem2107,
+                        groupItem2, groupItem3, groupItem4, groupItem5, groupItem6, groupItem100, groupItem101,
                                 groupItem102, groupItem103, groupItem104, groupItem105, groupItem106);
 
                 // empty timeline creation
@@ -116,6 +120,24 @@ public class GroupItemsExample extends Div {
                 p.getElement().getStyle().set("margin-bottom", "5px");
                 selectRangeLayout.add(p);
 
+                ComboBox<GroupItem> comboBox = new ComboBox<>("Group Name");
+                comboBox.setItems(groupItems);
+                comboBox.setItemLabelGenerator(GroupItem::getContent);
+                comboBox.setRenderer(createRenderer());
+//                        (new TextRenderer<>(GroupItem -> {
+//                        String style = "";
+//                        if (GroupItem.getTreeLevel() == 0) {
+//                                style = "font-weight: bold;";
+//                        }
+//                        else if(GroupItem.getTreeLevel() == 1)
+//                                style = "font-weight: semi-bold;";
+//                        else
+//                                style = "font-weight: normal;";
+//                        return "<span style=\"" + style + "\">" + GroupItem.getContent() + "</span>";
+//                }));
+                comboBox.setValue(groupItem10);
+                comboBox.setAllowCustomValue(true);
+
                 DateTimePicker datePicker1 = new DateTimePicker("Item start date: ");
                 datePicker1.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
                 datePicker1.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
@@ -125,12 +147,24 @@ public class GroupItemsExample extends Div {
                 datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
 
                 datePicker1.addValueChangeListener(
-                        e -> newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue()));
+                        e -> {
+                                GroupItem selectedGroupItem = comboBox.getValue();
+                                newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getId());
+                        });
                 datePicker2.addValueChangeListener(
-                        e -> newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue()));
+                        e -> {
+                                GroupItem selectedGroupItem = comboBox.getValue();
+                                newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getId());
+                        });
+
+                comboBox.addValueChangeListener(
+                        e -> {
+                                GroupItem selectedGroupItem = comboBox.getValue();
+                                newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getId());
+                        });
 
                 HorizontalLayout horizontalLayout = new HorizontalLayout();
-                horizontalLayout.add(datePicker1, datePicker2);
+                horizontalLayout.add(datePicker1, datePicker2, comboBox);
 
                 addItemButton =
                         new Button(
@@ -146,11 +180,6 @@ public class GroupItemsExample extends Div {
 
                 selectRangeLayout.add(horizontalLayout, addItemButton);
 
-                add(timeline, selectRangeLayout);
-
-//                add(timeline, log);
-
-
                 HorizontalLayout zoomOptionsLayout = new HorizontalLayout();
                 zoomOptionsLayout.setMargin(true);
                 Button oneDay = new Button("1 day", e -> timeline.setZoomOption(1));
@@ -158,16 +187,18 @@ public class GroupItemsExample extends Div {
                 Button fiveDays = new Button("5 days", e -> timeline.setZoomOption(5));
 
                 // Select Item
+                VerticalLayout selectLayout = new VerticalLayout();
                 TextField textField = new TextField();
-                Button setSelectBtn = new Button("Select Item 1", e -> {
+                Button setSelectBtn = new Button("Select Item", e -> {
                         timeline.setSelectItem(textField.getValue());
                 });
+                selectLayout.add(textField, setSelectBtn);
 
-                zoomOptionsLayout.add(oneDay, threeDays, fiveDays, setSelectBtn, textField);
+                zoomOptionsLayout.add(oneDay, threeDays, fiveDays, selectLayout);
 //                zoomOptionsLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
 //                zoomOptionsLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
 //
-                add(zoomOptionsLayout, timeline, log);
+                add(selectRangeLayout, zoomOptionsLayout, timeline, log);
 
         }
 
@@ -179,11 +210,11 @@ public class GroupItemsExample extends Div {
                 return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
         }
 
-        private Item createNewItem(LocalDateTime start, LocalDateTime end) {
+        private Item createNewItem(LocalDateTime start, LocalDateTime end, String groupID) {
                 if (start != null && end != null) {
                         if (start.isBefore(end)) {
                                 addItemButton.setEnabled(true);
-                                return new Item(start, end, 106);
+                                return new Item(start, end, Integer.parseInt(groupID));
                         } else {
                                 Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
                                 return null;
@@ -194,4 +225,36 @@ public class GroupItemsExample extends Div {
                 }
         }
 
+        private Renderer<GroupItem> createRenderer() {
+                StringBuilder tpl = new StringBuilder();
+//                tpl.append("<div style=\"display: flex;\">");
+//                tpl.append(
+//                        "  <img style=\"height: var(--lumo-size-m); margin-right: var(--lumo-space-s);\" src=\"${item.pictureUrl}\" alt=\"Portrait of ${item.firstName} ${item.lastName}\" />");
+//                tpl.append("  <div>");
+//                tpl.append("    ${item.firstName} ${item.lastName}");
+//                tpl.append(
+//                        "    <div style=\"font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);\">${item.profession}</div>");
+//                tpl.append("  </div>");
+//                tpl.append("</div>");
+                tpl.append("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>");
+
+                return LitRenderer.<GroupItem>of(tpl.toString())
+                        .withProperty("width", groupItem -> {
+                                if(groupItem.getTreeLevel() == 1)
+                                        return "bolder";
+                                else if(groupItem.getTreeLevel() == 2)
+                                        return "bold";
+                                else
+                                        return "normal";
+                        })
+                        .withProperty("fontsize", groupItem -> {
+                                if(groupItem.getTreeLevel() == 1)
+                                        return "1rem";
+                                else if(groupItem.getTreeLevel() == 2)
+                                        return "0.9rem";
+                                else
+                                        return "0.8rem";
+                        })
+                        .withProperty("content", GroupItem::getContent);
+        }
 }
