@@ -633,6 +633,7 @@ public class Timeline extends Div {
   public void onSelect(String selectedItemsIds) {
     selectedItemsIdsList.clear();   
     selectedItemsIdsList.addAll(Arrays.asList(selectedItemsIds.split(",")));
+    fireItemSelectEvent(selectedItemsIds, LocalDateTime.now(), LocalDateTime.now(),true);
   }
 
   public void onSelectItem(Timeline container, String selectedItemsId) {

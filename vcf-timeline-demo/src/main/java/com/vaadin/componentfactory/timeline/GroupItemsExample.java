@@ -7,16 +7,12 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.router.Route;
 
 import java.time.LocalDateTime;
@@ -109,10 +105,21 @@ public class GroupItemsExample extends Div {
                 // set multiselet so multiple items can be drag at once
                 timeline.setMultiselect(true);
 
+                // Select Item
+                VerticalLayout selectLayout = new VerticalLayout();
+                TextField textField = new TextField();
+                Button setSelectBtn = new Button("Select Item", e -> {
+                        timeline.setSelectItem(textField.getValue());
+                });
+                selectLayout.add(textField, setSelectBtn);
 
                 // add listener to get new range values for drag item(s)
                 timeline.addItemSelectListener(
-                        e -> timeline.onSelectItem(e.getTimeline(), e.getItemId()));
+                        e -> {
+                                timeline.onSelectItem(e.getTimeline(), e.getItemId());
+                                textField.setValue(e.getItemId());
+                        }
+                );
 
                 VerticalLayout selectRangeLayout = new VerticalLayout();
                 selectRangeLayout.setSpacing(false);
@@ -124,17 +131,6 @@ public class GroupItemsExample extends Div {
                 comboBox.setItems(groupItems);
                 comboBox.setItemLabelGenerator(GroupItem::getContent);
                 comboBox.setRenderer(createRenderer());
-//                        (new TextRenderer<>(GroupItem -> {
-//                        String style = "";
-//                        if (GroupItem.getTreeLevel() == 0) {
-//                                style = "font-weight: bold;";
-//                        }
-//                        else if(GroupItem.getTreeLevel() == 1)
-//                                style = "font-weight: semi-bold;";
-//                        else
-//                                style = "font-weight: normal;";
-//                        return "<span style=\"" + style + "\">" + GroupItem.getContent() + "</span>";
-//                }));
                 comboBox.setValue(groupItem10);
                 comboBox.setAllowCustomValue(true);
 
@@ -186,18 +182,9 @@ public class GroupItemsExample extends Div {
                 Button threeDays = new Button("3 days", e -> timeline.setZoomOption(3));
                 Button fiveDays = new Button("5 days", e -> timeline.setZoomOption(5));
 
-                // Select Item
-                VerticalLayout selectLayout = new VerticalLayout();
-                TextField textField = new TextField();
-                Button setSelectBtn = new Button("Select Item", e -> {
-                        timeline.setSelectItem(textField.getValue());
-                });
-                selectLayout.add(textField, setSelectBtn);
+
 
                 zoomOptionsLayout.add(oneDay, threeDays, fiveDays, selectLayout);
-//                zoomOptionsLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-//                zoomOptionsLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-//
                 add(selectRangeLayout, zoomOptionsLayout, timeline, log);
 
         }
@@ -227,15 +214,6 @@ public class GroupItemsExample extends Div {
 
         private Renderer<GroupItem> createRenderer() {
                 StringBuilder tpl = new StringBuilder();
-//                tpl.append("<div style=\"display: flex;\">");
-//                tpl.append(
-//                        "  <img style=\"height: var(--lumo-size-m); margin-right: var(--lumo-space-s);\" src=\"${item.pictureUrl}\" alt=\"Portrait of ${item.firstName} ${item.lastName}\" />");
-//                tpl.append("  <div>");
-//                tpl.append("    ${item.firstName} ${item.lastName}");
-//                tpl.append(
-//                        "    <div style=\"font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);\">${item.profession}</div>");
-//                tpl.append("  </div>");
-//                tpl.append("</div>");
                 tpl.append("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>");
 
                 return LitRenderer.<GroupItem>of(tpl.toString())
