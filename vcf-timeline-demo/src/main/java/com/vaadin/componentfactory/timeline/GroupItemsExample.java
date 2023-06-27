@@ -100,7 +100,7 @@ public class GroupItemsExample extends Div {
 
                 // setting timeline range
                 timeline.setTimelineRange(
-                                LocalDateTime.of(2023, 8, 1, 00, 00, 00), LocalDateTime.of(2023, 9, 25, 00, 00, 00));
+                                LocalDateTime.of(2023, 1, 1, 00, 00, 00), LocalDateTime.of(2023, 12, 31, 00, 00, 00));
 
                 // set multiselet so multiple items can be drag at once
                 timeline.setMultiselect(true);
