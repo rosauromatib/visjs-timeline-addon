@@ -430,7 +430,7 @@ window.vcftimeline = {
 
   onSelectItem: function (container, onSelectItem) {
     container.timeline._timeline.itemSet.setSelection(onSelectItem);
-    container.timeline._timeline.fit();
+    // container.timeline._timeline.fit();
   },
 
   addItem: function (container, newItemJson) {
