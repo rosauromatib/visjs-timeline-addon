@@ -112,9 +112,10 @@ window.vcftimeline = {
 
     const line_timeline = new Arrow(timeline, bGroup);
     container.timeline = line_timeline;
+    console.log("CCCCCCC", container.timeline);
 
     container.timeline._timeline.on("changed", () => {
-      this._updateConnections(container);
+      this._updateConnections(container, false);
       this._updateTimelineHeight(container);
     });
 
@@ -319,6 +320,10 @@ window.vcftimeline = {
     }, 100);
   },
 
+  setUseLineConnector: function (container, bUseLineConnector) {
+    console.log("AAAAAAAAAAA", bUseLineConnector);
+    this._updateConnections(container, bUseLineConnector);
+  },
   _moveWindowToRight(container, range, widthInMilliseconds) {
     container.timeline._timeline.setWindow(
       new Date(range.start.valueOf() - widthInMilliseconds / 50),
@@ -377,7 +382,7 @@ window.vcftimeline = {
           var startDate = window.vcftimeline._convertDate(item.start);
           var endDate = window.vcftimeline._convertDate(item.end);
           //update connections
-          window.vcftimeline._updateConnections(container);
+          window.vcftimeline._updateConnections(container, false);
           //call server
           container.$server.onMove(item.id, startDate, endDate, isResizedItem);
         } else {
@@ -554,11 +559,19 @@ window.vcftimeline = {
     return connections;
   },
 
-  _updateConnections: function (container) {
-    var connections = this._createConnections(
-      container.timeline._timeline.itemsData.get()
-    );
-    container.timeline.setDependencies(connections);
+  _updateConnections: function (container, bUseLineConnector) {
+    console.log("EEEEE", bUseLineConnector);
+    if (bUseLineConnector) {
+      console.log("DDDDDDD", container.timeline._timeline);
+      var connections = this._createConnections(
+          container.timeline._timeline.itemsData.get()
+      );
+      container.timeline.setDependencies(connections);
+    }
+    else {
+      console.log("BBBBBBBBB", container.timeline._timeline);
+      container.timeline.setDependencies([]);
+    }
   },
 
   _updateTimelineHeight: function (container) {

@@ -183,11 +183,8 @@ public class GroupItemsExample extends Div {
                 Button threeDays = new Button("3 days", e -> timeline.setZoomOption(3));
                 Button fiveDays = new Button("5 days", e -> timeline.setZoomOption(5));
 
-
-
                 zoomOptionsLayout.add(oneDay, threeDays, fiveDays, selectLayout);
                 add(selectRangeLayout, zoomOptionsLayout, timeline, log);
-
         }
 
         private boolean cancelMove(List<Item> items) {

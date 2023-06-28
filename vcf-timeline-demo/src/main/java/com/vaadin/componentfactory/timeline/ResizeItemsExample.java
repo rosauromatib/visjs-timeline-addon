@@ -1,6 +1,7 @@
 package com.vaadin.componentfactory.timeline;
 
 import com.vaadin.componentfactory.timeline.model.Item;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -64,8 +65,9 @@ public class ResizeItemsExample extends Div {
                         + formatDates(e.getNewStart())
                         + " - New end: "
                         + formatDates(e.getNewEnd()))));
+    Button drawLine = new Button("DrawLine", e -> timeline.setUseLineConnector(true));
 
-    add(timeline, log);
+    add(timeline, log, drawLine);
   }
 
   private String formatDates(LocalDateTime date) {

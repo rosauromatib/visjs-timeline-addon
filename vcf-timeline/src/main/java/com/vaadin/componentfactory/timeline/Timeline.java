@@ -85,6 +85,13 @@ public class Timeline extends Div {
 //    addGroupIDToItmes();
   }
 
+  public void setUseLineConnector(boolean bUseLine) {
+    this.getElement()
+            .executeJs(
+                    "vcftimeline.setUseLineConnector($0, $1)",
+                    this,bUseLine);
+  }
+
 
   protected TimelineOptions getTimelineOptions() {
     return this.timelineOptions;
