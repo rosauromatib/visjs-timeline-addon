@@ -164,15 +164,15 @@ public class Timeline extends Div {
    *
    * @param item the new item to add to the timeline
    */
-  public void addItem(Item item) {
-    this.getElement().executeJs("vcftimeline.addItem($0, $1)", this, item.toJSON());
+  public void addItem(Item item, boolean autoZoom) {
+    this.getElement().executeJs("vcftimeline.addItem($0, $1, $2)", this, item.toJSON(), autoZoom);
     this.items.add(item);
   }
 
-  public void setItems(List<Item> items) {
+  public void setItems(List<Item> items, boolean autoZoom) {
     this.items = new ArrayList<>(items);
     this.getElement()
-        .executeJs("vcftimeline.setItems($0, $1)", this, "[" + convertItemsToJson() + "]");
+        .executeJs("vcftimeline.setItems($0, $1, $2)", this, "[" + convertItemsToJson() + "]", autoZoom);
   }
 
   /**
@@ -636,12 +636,12 @@ public class Timeline extends Div {
     fireItemSelectEvent(selectedItemsIds, LocalDateTime.now(), LocalDateTime.now(),true);
   }
 
-  public void onSelectItem(Timeline container, String selectedItemsId) {
+  public void onSelectItem(Timeline container, String selectedItemsId, boolean autoZoom) {
 //    if(this.getElement().getNode().isAttached()) {
       this.getElement()
               .executeJs(
-                      "vcftimeline.onSelectItem($0, $1, $2)",
-                      container, selectedItemsId);
+                      "vcftimeline.onSelectItem($0, $1, $2, $3)",
+                      container, selectedItemsId, autoZoom);
 //    }
     updateTimelineOptions();
   }

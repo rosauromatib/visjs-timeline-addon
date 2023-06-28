@@ -55,7 +55,7 @@ public class AddEmptyItemsExample extends VerticalLayout {
         new Button(
             "Add Item",
             e -> {
-              timeline.addItem(newItem);
+              timeline.addItem(newItem, false);
               newItem = null;
               datePicker1.clear();
               datePicker2.clear();

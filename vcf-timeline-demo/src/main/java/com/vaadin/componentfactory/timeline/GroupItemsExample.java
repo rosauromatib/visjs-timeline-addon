@@ -100,7 +100,7 @@ public class GroupItemsExample extends Div {
 
                 // setting timeline range
                 timeline.setTimelineRange(
-                                LocalDateTime.of(2023, 1, 1, 00, 00, 00), LocalDateTime.of(2023, 12, 31, 00, 00, 00));
+                                LocalDateTime.of(2023, 1, 1, 00, 00, 00), LocalDateTime.of(2023, 9, 25, 00, 00, 00));
 
                 // set multiselet so multiple items can be drag at once
                 timeline.setMultiselect(true);
@@ -114,9 +114,10 @@ public class GroupItemsExample extends Div {
                 selectLayout.add(textField, setSelectBtn);
 
                 // add listener to get new range values for drag item(s)
+                boolean bAutoZoom = false;
                 timeline.addItemSelectListener(
                         e -> {
-                                timeline.onSelectItem(e.getTimeline(), e.getItemId());
+                                timeline.onSelectItem(e.getTimeline(), e.getItemId(), bAutoZoom);
                                 textField.setValue(e.getItemId());
                         }
                 );
@@ -166,7 +167,7 @@ public class GroupItemsExample extends Div {
                         new Button(
                                 "Add Item",
                                 e -> {
-                                        timeline.addItem(newItem);
+                                        timeline.addItem(newItem, bAutoZoom);
                                         newItem = null;
                                         datePicker1.clear();
                                         datePicker2.clear();

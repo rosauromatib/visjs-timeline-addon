@@ -33,10 +33,10 @@ public class MainLayout extends AppLayout {
     final RouterLink groupItemsExample =
             new RouterLink("Group Items ", GroupItemsExample.class);
 
-//    final VerticalLayout menuLayout = new VerticalLayout(readonlyEmptyExample, addEmptyItemsExample,
-//        resizeItems, dndItems, tooltipsExample, classNameExample, readonlyExample,
-//        updateItemContentExample, zoomOptionsExample, overlappExample, tooltipOnUpdateExample, groupItemsExample);
-    final VerticalLayout menuLayout = new VerticalLayout(groupItemsExample);
+    final VerticalLayout menuLayout = new VerticalLayout(readonlyEmptyExample, addEmptyItemsExample,
+        resizeItems, dndItems, tooltipsExample, classNameExample, readonlyExample,
+        updateItemContentExample, zoomOptionsExample, overlappExample, tooltipOnUpdateExample, groupItemsExample);
+//    final VerticalLayout menuLayout = new VerticalLayout(groupItemsExample);
     addToDrawer(menuLayout);
     addToNavbar(drawerToggle);
   }

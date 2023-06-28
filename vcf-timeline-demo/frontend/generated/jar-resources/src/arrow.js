@@ -45,7 +45,7 @@
 
  export default class Arrow {
 
-    constructor(timeline) {
+    constructor(timeline, bGroup) {
         this._svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         this._timeline = timeline;
 
@@ -53,11 +53,14 @@
             "http://www.w3.org/2000/svg",
             "path"
         );
+
+        this._bGroup = bGroup;
         
         this._dependency = [];
         this._dependencyPath = [];
         this._minItemHeight = null;
-        this._initialize();
+        if (!this._bGroup)
+            this._initialize();
     }
   
     _initialize() {
@@ -69,7 +72,7 @@
         this._svg.style.display = "block";
         this._svg.style.zIndex = "-1"; // Should it be above or below? (1 for above, -1 for below)
         this._svg.style.pointerEvents = "none"; // To click through, if we decide to put it above other elements.
-        // this._timeline.dom.center.appendChild(this._svg);
+        this._timeline.dom.center.appendChild(this._svg);
     }
     
     _createPath(){
@@ -214,7 +217,8 @@
 
         this._minItemHeight = this._getMinItemHeight();
 
-        this._drawDependencies();
+        if (!this._bGroup)
+            this._drawDependencies();
     }
 
     _getMinItemHeight(){

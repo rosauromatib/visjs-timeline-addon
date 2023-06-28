@@ -43,7 +43,10 @@ window.vcftimeline = {
     var parsedItems = JSON.parse(itemsJson);
     var items;
     var groupItems = new DataSet();
-    if (groupsJson != null) {
+    var bGroup = false;
+    if (groupsJson != null)
+      bGroup = true;
+    if (bGroup) {
       var parsedGroupItems = JSON.parse(groupsJson);
 
       for (var i = 0; i < parsedGroupItems.length; i++) {
@@ -94,7 +97,7 @@ window.vcftimeline = {
 
     // Create Timeline
     var timeline;
-    if (groupsJson != null) {
+    if (bGroup) {
       let startDay = moment().startOf("month").startOf("week").isoWeekday(1);
       var options1 = {
         start: startDay.toDate(),
@@ -107,7 +110,7 @@ window.vcftimeline = {
       timeline = new Timeline(container, items, groupItems, options);
     } else timeline = new Timeline(container, items, options);
 
-    const line_timeline = new Arrow(timeline);
+    const line_timeline = new Arrow(timeline, bGroup);
     container.timeline = line_timeline;
 
     container.timeline._timeline.on("changed", () => {
@@ -428,12 +431,14 @@ window.vcftimeline = {
     container.timeline._timeline.setOptions(options);
   },
 
-  onSelectItem: function (container, onSelectItem) {
+  onSelectItem: function (container, onSelectItem, autoZoom) {
     container.timeline._timeline.itemSet.setSelection(onSelectItem);
-    container.timeline._timeline.fit();
+    if (autoZoom) {
+      container.timeline._timeline.fit();
+    }
   },
 
-  addItem: function (container, newItemJson) {
+  addItem: function (container, newItemJson, autoZoom) {
     var parsedItems = JSON.parse(newItemJson);
     container.timeline._timeline.itemsData.add({
       id: Object.keys(container.timeline._timeline.itemSet.items).length,
@@ -443,13 +448,16 @@ window.vcftimeline = {
       end: parsedItems.end,
       type: 0,
     });
-    container.timeline._timeline.fit();
+    if (autoZoom) {
+      container.timeline._timeline.fit();
+    }
   },
 
-  setItems: function (container, itemsJson) {
+  setItems: function (container, itemsJson, autoZoom) {
     var items = new DataSet(JSON.parse(itemsJson));
     container.timeline._timeline.setItems(items);
-    container.timeline._timeline.fit();
+    if (autoZoom)
+      container.timeline._timeline.fit();
   },
 
   revertMove: function (container, itemId, itemJson) {
