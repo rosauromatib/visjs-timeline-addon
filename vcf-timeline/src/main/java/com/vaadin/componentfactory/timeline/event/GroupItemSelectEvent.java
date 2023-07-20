@@ -20,43 +20,40 @@
 package com.vaadin.componentfactory.timeline.event;
 
 import com.vaadin.componentfactory.timeline.Timeline;
+import com.vaadin.componentfactory.timeline.model.GroupItem;
 import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.DomEvent;
+import com.vaadin.flow.component.EventData;
+import com.vaadin.flow.component.html.Div;
+
 import java.time.LocalDateTime;
 
 /**
  * Event thrown when an item is resized.
  */
-public class ItemSelectEvent extends ItemResizeEvent {
+public class GroupItemSelectEvent extends ComponentEvent<Div> {
 
-    private final String itemId;
-    private final LocalDateTime newStart;
-    private final LocalDateTime newEnd;
+    private String groupId;
+    private Timeline source;
+
     private boolean cancelled = false;
 
-    public ItemSelectEvent(
+    public GroupItemSelectEvent(
             Timeline source,
-            String itemId,
-            LocalDateTime newStart,
-            LocalDateTime newEnd,
+            String groupId,
             boolean fromClient) {
-        super(source, itemId, newStart, newEnd, fromClient);
-        this.itemId = itemId;
-        this.newStart = newStart;
-        this.newEnd = newEnd;
+        super(source, fromClient);
+        this.groupId = groupId;
+        this.source = source;
+
     }
 
-    public String getItemId() {
-        return itemId;
+    public String getGroupId() {
+        return groupId;
     }
-
-    public LocalDateTime getNewStart() {
-        return newStart;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
-
-    public LocalDateTime getNewEnd() {
-        return newEnd;
-    }
-
     public boolean isCancelled() {
         return cancelled;
     }
@@ -68,6 +65,7 @@ public class ItemSelectEvent extends ItemResizeEvent {
     public Timeline getTimeline() {
         return (Timeline) source;
     }
+
 }
 
 

@@ -44,11 +44,9 @@ window.vcftimeline = {
     var items;
     var groupItems = new DataSet();
     var bGroup = false;
-    if (groupsJson != null)
-      bGroup = true;
+    if (groupsJson != null) bGroup = true;
     if (bGroup) {
       var parsedGroupItems = JSON.parse(groupsJson);
-
       for (var i = 0; i < parsedGroupItems.length; i++) {
         var nestedGroups = [];
         var groupsNested = [];
@@ -63,11 +61,12 @@ window.vcftimeline = {
         }
 
         groupItems.add({
-          id: Number.parseInt(parsedGroupItems[i].id),
+          id: Number.parseInt(parsedGroupItems[i].groupId),
           content: parsedGroupItems[i].content,
           treeLevel: parsedGroupItems[i].treeLevel,
           nestedGroups: groupsNested,
           visible: parsedGroupItems[i].visible,
+          className: "vis-group-unselected",
         });
       }
       items = new DataSet();
@@ -78,23 +77,14 @@ window.vcftimeline = {
         var type = 0;
 
         items.add({
-          id: i,
-          group: parsedItems[i].group,
-          content: "item " + i,
-          start: start,
-          end: end,
-          type: type,
+          id: i, group: parsedItems[i].group, content: "item " + i, start: start, end: end, type: type,
         });
       }
 
-    }
-    else
-      var items = new DataSet(parsedItems);
+    } else items = new DataSet(parsedItems);
 
-
-   // // Get options for timeline configuration
+    // // Get options for timeline configuration
     var options = this._processOptions(container, optionsJson);
-
     // Create Timeline
     var timeline;
     if (bGroup) {
@@ -112,216 +102,148 @@ window.vcftimeline = {
 
     const line_timeline = new Arrow(timeline, bGroup);
     container.timeline = line_timeline;
-    console.log("CCCCCCC", container.timeline);
+
+
+    container.timeline._timeline.on("select", (properties) => {
+      var temp = properties.items.toString();
+      container.$server.onSelect(temp.replace(" ", ""));
+    });
+
+    // container.timeline._timeline.on("groupOnClick", (properties) => {
+    //     // container.$server.onSelectItemInGroup(properties.groupId);
+    // });
+    var group = null;
+    var bodyClicked = false;
+
+    container.timeline._timeline.itemSet.groupHammer.on("tap", (properties) => {
+      var itemSet = container.timeline._timeline.itemSet;
+      var temp = itemSet.groupFromTarget(properties);
+      group = itemSet.groupsData.get(temp.groupId);
+
+      container.$server.onSelectItemInGroup(group.id);
+      if (!group.nestedGroups) this._updateGroupClassName(container, group, "vis-group-selected");
+
+    });
+
+    container.timeline._timeline.on("_change", (properties) => {
+      console.log("AAAA:", group);
+      if (properties && !bodyClicked) {
+        this._updateGroupClassName(container, group, "vis-group-selected");
+        bodyClicked = true;
+      }
+    });
+    container.timeline._timeline.on("tap", (properties) => {
+      var targetEle = properties.firstTarget.classList.value;
+      if (bGroup) {
+        if (!(targetEle.includes("vis-label") || targetEle.includes("vis-inner"))) {
+          var itemSet = container.timeline._timeline.itemSet;
+          var tempGroup = itemSet.groupFromTarget(properties);
+          if (tempGroup) {
+            var group = itemSet.groupsData.get(tempGroup.groupId);
+
+            // container.$server.onSelectItemInGroup(group.id);
+            bodyClicked = true;
+
+            this._updateGroupClassName(container, group, "vis-group-selected");
+          }
+        }
+      }
+    });
 
     container.timeline._timeline.on("changed", () => {
       this._updateConnections(container, false);
       this._updateTimelineHeight(container);
     });
 
-    container.timeline._timeline.on("select", (properties) => {
-      container.$server.onSelect(properties.items);
-    });
-
-    var mouseX;
-    container.timeline._timeline.on("mouseMove", (properties) => {
-      mouseX = properties.event.clientX;
-    });
-
     setInterval(function () {
-      var isDragging =
-        container.timeline._timeline.itemSet.touchParams.itemIsDragging;
-      var isResizingRight =
-        container.timeline._timeline.itemSet.touchParams.dragRightItem;
-      var isResizingLeft =
-        container.timeline._timeline.itemSet.touchParams.dragLeftItem;
+      var isDragging = container.timeline._timeline.itemSet.touchParams.itemIsDragging;
+      var isResizingRight = container.timeline._timeline.itemSet.touchParams.dragRightItem;
+      var isResizingLeft = container.timeline._timeline.itemSet.touchParams.dragLeftItem;
       var isResizing = isResizingRight !== isResizingLeft;
       if (isDragging) {
-        let multiple =
-          container.timeline._timeline.itemSet.touchParams.itemProps.length > 1;
+        let multiple = container.timeline._timeline.itemSet.touchParams.itemProps.length > 1;
         let itemsInitialXMap = null;
         let selectedItems = null;
         if (multiple) {
           itemsInitialXMap = new Map();
-          container.timeline._timeline.itemSet.touchParams.itemProps.forEach(
-            (obj) => {
-              itemsInitialXMap.set(obj.data.id, obj.initialX);
-            }
-          );
-          selectedItems = Array.from(
-            container.timeline._timeline.itemSet.touchParams.itemProps,
-            (obj) => obj.item
-          );
+          container.timeline._timeline.itemSet.touchParams.itemProps.forEach((obj) => {
+            itemsInitialXMap.set(obj.data.id, obj.initialX);
+          });
+          selectedItems = Array.from(container.timeline._timeline.itemSet.touchParams.itemProps, (obj) => obj.item);
         }
 
-        var ix =
-          container.timeline._timeline.itemSet.touchParams.itemProps[0]
-            .initialX;
-        var item =
-          container.timeline._timeline.itemSet.touchParams.selectedItem;
+        var ix = container.timeline._timeline.itemSet.touchParams.itemProps[0].initialX;
+        var item = container.timeline._timeline.itemSet.touchParams.selectedItem;
         var range = container.timeline._timeline.getWindow();
-        var widthInPixels =
-          container.timeline._timeline.body.domProps.lastWidth;
-        var centerOfTimelineInPixels =
-          container.timeline._timeline.dom.container.offsetLeft +
-          container.timeline._timeline.body.domProps.lastWidth / 2;
+        var widthInPixels = container.timeline._timeline.body.domProps.lastWidth;
+        var centerOfTimelineInPixels = container.timeline._timeline.dom.container.offsetLeft + container.timeline._timeline.body.domProps.lastWidth / 2;
         var mouseAtLeftOfCenter = mouseX < centerOfTimelineInPixels;
         var widthInMilliseconds = range.end.valueOf() - range.start.valueOf();
 
         // handle autoscrolling when moving, not resizing
-        if (
-          mouseAtLeftOfCenter &&
-          item.data.start <= range.start &&
-          (options.min == undefined || range.start > new Date(options.min)) &&
-          !isResizing
-        ) {
-          window.vcftimeline._moveWindowToRight(
-            container,
-            range,
-            widthInMilliseconds
-          );
+        if (mouseAtLeftOfCenter && item.data.start <= range.start && (options.min == undefined || range.start > new Date(options.min)) && !isResizing) {
+          window.vcftimeline._moveWindowToRight(container, range, widthInMilliseconds);
           if (multiple) {
-            container.timeline._timeline.itemSet.touchParams.itemProps.forEach(
-              (ip) => {
-                let id = ip.data.id;
-                let initialXValue = itemsInitialXMap.get(id);
-                ip.initialX = initialXValue + widthInPixels / 50;
-              }
-            );
+            container.timeline._timeline.itemSet.touchParams.itemProps.forEach((ip) => {
+              let id = ip.data.id;
+              let initialXValue = itemsInitialXMap.get(id);
+              ip.initialX = initialXValue + widthInPixels / 50;
+            });
             selectedItems.forEach((selectedItem) => {
-              selectedItem.data.start = new Date(
-                selectedItem.data.start.valueOf() - widthInMilliseconds / 50
-              );
-              selectedItem.data.end = new Date(
-                selectedItem.data.end.valueOf() - widthInMilliseconds / 50
-              );
+              selectedItem.data.start = new Date(selectedItem.data.start.valueOf() - widthInMilliseconds / 50);
+              selectedItem.data.end = new Date(selectedItem.data.end.valueOf() - widthInMilliseconds / 50);
             });
           } else {
-            container.timeline._timeline.itemSet.touchParams.itemProps[0].initialX =
-              ix + widthInPixels / 50;
-            item.data.start = new Date(
-              item.data.start.valueOf() - widthInMilliseconds / 50
-            );
-            item.data.end = new Date(
-              item.data.end.valueOf() - widthInMilliseconds / 50
-            );
+            container.timeline._timeline.itemSet.touchParams.itemProps[0].initialX = ix + widthInPixels / 50;
+            item.data.start = new Date(item.data.start.valueOf() - widthInMilliseconds / 50);
+            item.data.end = new Date(item.data.end.valueOf() - widthInMilliseconds / 50);
           }
-        } else if (
-          !mouseAtLeftOfCenter &&
-          item.data.end >= range.end &&
-          (options.max == undefined || range.end < new Date(options.max)) &&
-          !isResizing
-        ) {
-          window.vcftimeline._moveWindowToLeft(
-            container,
-            range,
-            widthInMilliseconds
-          );
+        } else if (!mouseAtLeftOfCenter && item.data.end >= range.end && (options.max == undefined || range.end < new Date(options.max)) && !isResizing) {
+          window.vcftimeline._moveWindowToLeft(container, range, widthInMilliseconds);
           if (multiple) {
-            container.timeline._timeline.itemSet.touchParams.itemProps.forEach(
-              (ip) => {
-                let id = ip.data.id;
-                let initialXValue = itemsInitialXMap.get(id);
-                ip.initialX = initialXValue - widthInPixels / 50;
-              }
-            );
+            container.timeline._timeline.itemSet.touchParams.itemProps.forEach((ip) => {
+              let id = ip.data.id;
+              let initialXValue = itemsInitialXMap.get(id);
+              ip.initialX = initialXValue - widthInPixels / 50;
+            });
             selectedItems.forEach((selectedItem) => {
-              selectedItem.data.start = new Date(
-                selectedItem.data.start.valueOf() + widthInMilliseconds / 50
-              );
-              selectedItem.data.end = new Date(
-                selectedItem.data.end.valueOf() + widthInMilliseconds / 50
-              );
+              selectedItem.data.start = new Date(selectedItem.data.start.valueOf() + widthInMilliseconds / 50);
+              selectedItem.data.end = new Date(selectedItem.data.end.valueOf() + widthInMilliseconds / 50);
             });
           } else {
-            container.timeline._timeline.itemSet.touchParams.itemProps[0].initialX =
-              ix - widthInPixels / 50;
-            item.data.start = new Date(
-              item.data.start.valueOf() + widthInMilliseconds / 50
-            );
-            item.data.end = new Date(
-              item.data.end.valueOf() + widthInMilliseconds / 50
-            );
+            container.timeline._timeline.itemSet.touchParams.itemProps[0].initialX = ix - widthInPixels / 50;
+            item.data.start = new Date(item.data.start.valueOf() + widthInMilliseconds / 50);
+            item.data.end = new Date(item.data.end.valueOf() + widthInMilliseconds / 50);
           }
         }
 
         // auto scroll to left when resizing left
-        if (
-          item.data.start <= range.start &&
-          (options.min == undefined || range.start > new Date(options.min)) &&
-          isResizingLeft
-        ) {
-          window.vcftimeline._moveWindowToRight(
-            container,
-            range,
-            widthInMilliseconds,
-            widthInPixels,
-            ix
-          );
-          item.data.start = new Date(
-            item.data.start.valueOf() - widthInMilliseconds / 50
-          );
+        if (item.data.start <= range.start && (options.min == undefined || range.start > new Date(options.min)) && isResizingLeft) {
+          window.vcftimeline._moveWindowToRight(container, range, widthInMilliseconds, widthInPixels, ix);
+          item.data.start = new Date(item.data.start.valueOf() - widthInMilliseconds / 50);
         }
 
         // auto scroll to right when resizing left
-        if (
-          item.data.start >= range.end &&
-          (options.max == undefined || range.end < new Date(options.max)) &&
-          isResizingLeft
-        ) {
-          window.vcftimeline._moveWindowToLeft(
-            container,
-            range,
-            widthInMilliseconds,
-            widthInPixels,
-            ix
-          );
-          item.data.start = new Date(
-            item.data.start.valueOf() + widthInMilliseconds / 50
-          );
+        if (item.data.start >= range.end && (options.max == undefined || range.end < new Date(options.max)) && isResizingLeft) {
+          window.vcftimeline._moveWindowToLeft(container, range, widthInMilliseconds, widthInPixels, ix);
+          item.data.start = new Date(item.data.start.valueOf() + widthInMilliseconds / 50);
         }
 
         // auto scroll to right when resizing right
-        if (
-          item.data.end >= range.end &&
-          (options.max == undefined || range.end < new Date(options.max)) &&
-          isResizingRight
-        ) {
-          window.vcftimeline._moveWindowToLeft(
-            container,
-            range,
-            widthInMilliseconds,
-            widthInPixels,
-            ix
-          );
-          item.data.end = new Date(
-            item.data.end.valueOf() + widthInMilliseconds / 50
-          );
+        if (item.data.end >= range.end && (options.max == undefined || range.end < new Date(options.max)) && isResizingRight) {
+          window.vcftimeline._moveWindowToLeft(container, range, widthInMilliseconds, widthInPixels, ix);
+          item.data.end = new Date(item.data.end.valueOf() + widthInMilliseconds / 50);
         }
 
         // auto scroll to left when resizing right
-        if (
-          item.data.end <= range.start &&
-          (options.min == undefined || range.start > new Date(options.min)) &&
-          isResizingRight
-        ) {
-          window.vcftimeline._moveWindowToRight(
-            container,
-            range,
-            widthInMilliseconds,
-            widthInPixels,
-            ix
-          );
-          item.data.end = new Date(
-            item.data.end.valueOf() - widthInMilliseconds / 50
-          );
+        if (item.data.end <= range.start && (options.min == undefined || range.start > new Date(options.min)) && isResizingRight) {
+          window.vcftimeline._moveWindowToRight(container, range, widthInMilliseconds, widthInPixels, ix);
+          item.data.end = new Date(item.data.end.valueOf() - widthInMilliseconds / 50);
         }
       }
     }, 100);
   },
-
   setUseLineConnector: function (container, bUseLineConnector) {
-    console.log("AAAAAAAAAAA", bUseLineConnector);
     this._updateConnections(container, bUseLineConnector);
   },
   _moveWindowToRight(container, range, widthInMilliseconds) {
@@ -490,6 +412,40 @@ window.vcftimeline = {
     container.timeline._timeline.itemsData.update(itemData);
   },
 
+  _updateGroupClassName: function (container, group, newClassName) {
+    var data = {
+      id: Number.parseInt(group.id),
+      content: group.content,
+      treeLevel: group.treeLevel,
+      nestedGroups: group.nestedGroups,
+      visible: group.visible,
+      className: newClassName,
+    };
+    this._removeGroupsClassName(container, group.id, "vis-group-unselected");
+    container.timeline._timeline.itemSet.groups[group.id].setData(data);
+  },
+
+  _removeGroupsClassName: function (container, groupId, oldClassName) {
+    var itemSet = container.timeline._timeline.itemSet;
+    var parsedGroups = Object.keys(itemSet.groups);
+    for (var anyGroupId = 0; anyGroupId < parsedGroups.length; anyGroupId++) {
+      if (Number.parseInt(parsedGroups[anyGroupId]) != Number.parseInt(groupId)) {
+        var tempGroup = itemSet.groupsData.get(Number.parseInt(parsedGroups[anyGroupId]));
+        if (tempGroup != null) {
+          var data = {
+            id: Number.parseInt(tempGroup.id),
+            content: tempGroup.content,
+            treeLevel: tempGroup.treeLevel,
+            nestedGroups: tempGroup.nestedGroups,
+            visible: tempGroup.visible,
+            className: oldClassName,
+          };
+          container.timeline._timeline.itemSet.groups[tempGroup.id].setData(data);
+        }
+      }
+    }
+  },
+
   setZoomOption: function (container, zoomDays) {
     var startDate;
     var selectedItems = container.timeline._timeline.getSelection();
@@ -560,16 +516,13 @@ window.vcftimeline = {
   },
 
   _updateConnections: function (container, bUseLineConnector) {
-    console.log("EEEEE", bUseLineConnector);
     if (bUseLineConnector) {
-      console.log("DDDDDDD", container.timeline._timeline);
       var connections = this._createConnections(
           container.timeline._timeline.itemsData.get()
       );
       container.timeline.setDependencies(connections);
     }
     else {
-      console.log("BBBBBBBBB", container.timeline._timeline);
       container.timeline.setDependencies([]);
     }
   },

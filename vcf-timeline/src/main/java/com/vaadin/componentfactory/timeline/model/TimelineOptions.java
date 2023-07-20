@@ -9,9 +9,9 @@ package com.vaadin.componentfactory.timeline.model;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -82,11 +82,19 @@ public class TimelineOptions {
   /* The initial start date for the axis of the timeline.
    * If not provided, the earliest date present in the events is taken as start date. */
   public LocalDateTime start;
-  
-  /* The initial end date for the axis of the timeline. If not provided, 
+
+  /* The initial end date for the axis of the timeline. If not provided,
    * the latest date present in the items set is taken as end date. */
   public LocalDateTime end;
-  
+
+  /* The initial start date for the axis of the timeline.
+   * If not provided, the earliest date present in the events is taken as start date. */
+  public LocalDateTime highlightStart;
+
+  /* The initial end date for the axis of the timeline. If not provided,
+   * the latest date present in the items set is taken as end date. */
+  public LocalDateTime highlightEnd;
+
   /* If true, multiple items can be selected using ctrl+click, shift+click, or by holding items.
    * Only applicable when option selectable is true. */
   public boolean multiselect = false;
@@ -97,13 +105,13 @@ public class TimelineOptions {
 
   /* By default snap is set to fifteen minutes */
   public Integer snapStep = SnapStep.QUARTER.getMinutes();
-  
+
   public boolean autoZoom = false;
-  
+
   public boolean tooltipOnItemUpdateTime = false;
-  
+
   public String tooltipOnItemUpdateTimeDateFormat;
-  
+
   public String tooltipOnItemUpdateTimeTemplate;
 
   public String toJSON() {
@@ -132,8 +140,8 @@ public class TimelineOptions {
     js.put("multiselect", multiselect);
     js.put("showTooltips", showTooltips);
     js.put("snapStep", snapStep);
-    js.put("autoZoom", autoZoom);
-    
+    js.put("autoZoom", autoZoom);//highlightStart
+
     js.put("tooltipOnItemUpdateTime", tooltipOnItemUpdateTime);
     Optional.ofNullable(tooltipOnItemUpdateTimeDateFormat).ifPresent(v -> js.put("tooltipOnItemUpdateTimeDateFormat", v.toString()));
     Optional.ofNullable(tooltipOnItemUpdateTimeTemplate).ifPresent(v -> js.put("tooltipOnItemUpdateTimeTemplate", v.toString()));
