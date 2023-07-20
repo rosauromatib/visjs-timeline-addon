@@ -45,7 +45,7 @@ public class GroupItemsExample extends Div {
                 LocalDateTime.of(2023, 1, 1, 00, 00, 00), LocalDateTime.of(2023, 9, 25, 00, 00, 00));
 
         timeline.setMultiselect(true);
-//        timeline.setStack(true);
+        timeline.setStack(true);
         boolean bAutoZoom = false;
 
         // Select Item
@@ -239,16 +239,15 @@ public class GroupItemsExample extends Div {
         item4.setId("3");
         item4.setEditable(true);
         item4.setUpdateTime(true);
-//        Item item5 = new Item(
-//                LocalDateTime.of(2023, 8, 11, 1, 30, 00),
-//                LocalDateTime.of(2023, 8, 17, 1, 00, 00),
-//                "Item 5", 1);
-//        item5.setId("4");
-//        item5.setEditable(true);
-//        item5.setUpdateTime(true);
+        Item item5 = new Item(
+                LocalDateTime.of(2023, 8, 11, 1, 30, 00),
+                LocalDateTime.of(2023, 8, 17, 1, 00, 00),
+                "Item 5", 1);
+        item5.setId("4");
+        item5.setEditable(true);
+        item5.setUpdateTime(true);
 
-//        List<Item> items = Arrays.asList(item1, item2, item3, item4, item5);
-        List<Item> items = Arrays.asList(item1, item2, item3, item4);
+        List<Item> items = Arrays.asList(item1, item2, item3, item4, item5);
         return items;
     }
 
