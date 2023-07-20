@@ -242,18 +242,18 @@ window.vcftimeline = {
     setUseLineConnector: function (container, bUseLineConnector) {
         this._updateConnections(container, bUseLineConnector);
     },
-    // setHighlightRange: function (container, start, end) {
-    //     container.timeline._timeline.on("changed", () => {
-    //         container.timeline._timeline.timeAxis._repaintLabels();
-    //         var left = (start - container.timeline._timeline.range.start)
-    //             * container.timeline._timeline.body.domProps.centerContainer.width
-    //             / (container.timeline._timeline.range.end - container.timeline._timeline.range.start);
-    //         var width = (end - start)
-    //             * container.timeline._timeline.body.domProps.centerContainer.width
-    //             / (container.timeline._timeline.range.end - container.timeline._timeline.range.start);
-    //         container.timeline._timeline.timeAxis._repaintMinorLine(left, width, "both", "vis-grid-highlighted");
-    //     });
-    // },
+    setHighlightRange: function (container, start, end) {
+        container.timeline._timeline.on("changed", () => {
+            container.timeline._timeline.timeAxis._repaintLabels();
+            var left = (start - container.timeline._timeline.range.start)
+                * container.timeline._timeline.body.domProps.centerContainer.width
+                / (container.timeline._timeline.range.end - container.timeline._timeline.range.start);
+            var width = (end - start)
+                * container.timeline._timeline.body.domProps.centerContainer.width
+                / (container.timeline._timeline.range.end - container.timeline._timeline.range.start);
+            container.timeline._timeline.timeAxis._repaintMinorLine(left, width, "both", "vis-grid-highlighted");
+        });
+    },
     _moveWindowToRight(container, range, widthInMilliseconds) {
         container.timeline._timeline.setWindow(new Date(range.start.valueOf() - widthInMilliseconds / 50), new Date(range.end.valueOf() - widthInMilliseconds / 50), {animation: false});
     },

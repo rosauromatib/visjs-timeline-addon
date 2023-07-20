@@ -53,61 +53,60 @@ public class GroupItemsExample extends Div {
 
         VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, groupItems);
         HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
-//        VerticalLayout selectHighlightRangeLayout = getSelectHighlightRangeLayout(timeline, bAutoZoom);
+        VerticalLayout selectHighlightRangeLayout = getSelectHighlightRangeLayout(timeline, bAutoZoom);
 
-//        add(selectRangeLayout, zoomOptionsLayout, selectHighlightRangeLayout, timeline, log);
-        add(selectRangeLayout, zoomOptionsLayout, timeline, log);
+        add(selectRangeLayout, zoomOptionsLayout, selectHighlightRangeLayout, timeline, log);
     }
 
     private boolean cancelMove(List<Item> items) {
         return items.stream().anyMatch(i -> i.getId().equals("0") || i.getId().equals("3"));
     }
 
-//    private VerticalLayout getSelectHighlightRangeLayout(Timeline timeline, boolean bAutoZoom) {
-//        VerticalLayout selectRangeLayout = new VerticalLayout();
-//        selectRangeLayout.setSpacing(false);
-//        Paragraph p = new Paragraph("Select range for new focus: ");
-//        p.getElement().getStyle().set("margin-bottom", "5px");
-//        selectRangeLayout.add(p);
-//
-//        DateTimePicker startRange = new DateTimePicker("Focus start date: ");
-//        startRange.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
-//        startRange.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
-//
-//        DateTimePicker endRange = new DateTimePicker("Focus end date: ");
-//        endRange.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
-//        endRange.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
-//
-//        startRange.addValueChangeListener(
-//                e -> {
-//                    timeline.setHighlightStart(startRange.getValue());
-//                    this.createHighLightRange(timeline, startRange.getValue(), endRange.getValue(), startRange, endRange);
-//                });
-//        endRange.addValueChangeListener(
-//                e -> {
-//                    timeline.setHighlightEnd(endRange.getValue());
-//                    this.createHighLightRange(timeline, startRange.getValue(), endRange.getValue(), startRange, endRange);
-//                });
-//
-//
-//        HorizontalLayout horizontalLayout = new HorizontalLayout();
-//        horizontalLayout.add(startRange, endRange);
-//        selectRangeLayout.add(horizontalLayout);
-//        return selectRangeLayout;
-//    }
-//
-//    private void createHighLightRange(Timeline timeline, LocalDateTime start, LocalDateTime end, DateTimePicker startRange, DateTimePicker endRange) {
-//        if (start != null && end != null) {
-//            if (start.isBefore(end)) {
-//                timeline.onSetHighlightRange(timeline, start, end);
-//                startRange.clear();
-//                endRange.clear();
-//            } else {
-//                Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
-//            }
-//        } else {
-//        }
-//    }
+    private VerticalLayout getSelectHighlightRangeLayout(Timeline timeline, boolean bAutoZoom) {
+        VerticalLayout selectRangeLayout = new VerticalLayout();
+        selectRangeLayout.setSpacing(false);
+        Paragraph p = new Paragraph("Select range for new focus: ");
+        p.getElement().getStyle().set("margin-bottom", "5px");
+        selectRangeLayout.add(p);
+
+        DateTimePicker startRange = new DateTimePicker("Focus start date: ");
+        startRange.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
+        startRange.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
+
+        DateTimePicker endRange = new DateTimePicker("Focus end date: ");
+        endRange.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
+        endRange.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
+
+        startRange.addValueChangeListener(
+                e -> {
+                    timeline.setHighlightStart(startRange.getValue());
+                    this.createHighLightRange(timeline, startRange.getValue(), endRange.getValue(), startRange, endRange);
+                });
+        endRange.addValueChangeListener(
+                e -> {
+                    timeline.setHighlightEnd(endRange.getValue());
+                    this.createHighLightRange(timeline, startRange.getValue(), endRange.getValue(), startRange, endRange);
+                });
+
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.add(startRange, endRange);
+        selectRangeLayout.add(horizontalLayout);
+        return selectRangeLayout;
+    }
+
+    private void createHighLightRange(Timeline timeline, LocalDateTime start, LocalDateTime end, DateTimePicker startRange, DateTimePicker endRange) {
+        if (start != null && end != null) {
+            if (start.isBefore(end)) {
+                timeline.onSetHighlightRange(timeline, start, end);
+                startRange.clear();
+                endRange.clear();
+            } else {
+                Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
+            }
+        } else {
+        }
+    }
 
     private VerticalLayout getSelectRangeLayout(Timeline timeline, boolean bAutoZoom, List<GroupItem> groupItems) {
         VerticalLayout selectRangeLayout = new VerticalLayout();

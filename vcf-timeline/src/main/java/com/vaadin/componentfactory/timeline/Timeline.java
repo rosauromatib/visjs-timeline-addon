@@ -687,17 +687,17 @@ public class Timeline extends Div {
         updateTimelineOptions();
     }
 
-//    public void onSetHighlightRange(Timeline container, LocalDateTime start, LocalDateTime end) {
-//        Instant instant = start.atZone(ZoneId.systemDefault()).toInstant();
-//        long startStamp = instant.toEpochMilli();
-//        instant = end.atZone(ZoneId.systemDefault()).toInstant();
-//        long endStamp = instant.toEpochMilli();
-//        this.getElement()
-//                .executeJs(
-//                        "vcftimeline.setHighlightRange($0, $1, $2)",
-//                        container, Long.toString(startStamp), Long.toString(endStamp));
-////        updateTimelineOptions();
-//    }
+    public void onSetHighlightRange(Timeline container, LocalDateTime start, LocalDateTime end) {
+        Instant instant = start.atZone(ZoneId.systemDefault()).toInstant();
+        long startStamp = instant.toEpochMilli();
+        instant = end.atZone(ZoneId.systemDefault()).toInstant();
+        long endStamp = instant.toEpochMilli();
+        this.getElement()
+                .executeJs(
+                        "vcftimeline.setHighlightRange($0, $1, $2)",
+                        container, Long.toString(startStamp), Long.toString(endStamp));
+//        updateTimelineOptions();
+    }
 
     /**
      * Adds a listener for {@link ItemsDragAndDropEvent} to the component.
