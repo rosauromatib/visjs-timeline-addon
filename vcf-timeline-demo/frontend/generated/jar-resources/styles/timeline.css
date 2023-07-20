@@ -7,15 +7,26 @@
 }
 
 .timeline .vis-timeline {
-	overflow-y: visible;
+    overflow-y: visible;
     overflow-x: clip;
 }
 
 .timeline .vis-center {
-	overflow-y: visible;
+    overflow-y: visible;
     overflow-x: clip;
 }
 
-.timeline .vis-item .vis-onUpdateTime-tooltip{
-	width: auto;
+.timeline .vis-item .vis-onUpdateTime-tooltip {
+    width: auto;
+}
+
+.vis-nested-group.vis-group-selected {
+    background-color: darkgrey !important;
+    border: 2px solid red !important;
+}
+
+.vis-grid-highlighted {
+    background-color: rgba(255, 0, 0, 0.2) !important;
+    outline: 2px solid red !important;
+    z-index: 1000;
 }

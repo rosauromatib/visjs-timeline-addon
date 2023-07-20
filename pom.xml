@@ -13,11 +13,16 @@
     <description>timeline component based on vis-timeline library</description>
 
     <properties>
-        <vaadin.version>14.6.8</vaadin.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>17</java.version>
+        <vaadin.version>24.1.0</vaadin.version>
+        <selenium.version>4.8.3</selenium.version>
+        <!--        <maven.compiler.source>3.9.2</maven.compiler.source>-->
+        <!--        <maven.compiler.target>3.9.2</maven.compiler.target>-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <inceptionYear>2021</inceptionYear>
     <organization>
