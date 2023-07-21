@@ -121,6 +121,7 @@ window.vcftimeline = {
         });
 
         container.timeline._timeline.on("tap", (properties) => {
+            console.log("ABC: ", container.timeline._timeline);
             var targetEle = properties.firstTarget.classList.value;
             if (bGroup) {
                 if (!(targetEle.includes("vis-label") || targetEle.includes("vis-inner"))) {
@@ -276,21 +277,35 @@ window.vcftimeline = {
         var endPointTime;
         var startPointY = -1000000;
         var endPointY;
+
+        // if(bFocus){
+        //     container.timeline._timeline.touch.allowDragging = false;
+        // }
+        // else
+        //     container.timeline._timeline.touch.allowDragging = true;
+
         container.timeline._timeline.on("mouseDown", (e) => {
             startPointTime = e.time.getTime();
             startPointY = e.y;
+            if(bFocus){
+                container.timeline._timeline.touch.allowDragging = false;
+            }
             // if (e.item != null) bItemClicked = true; else bItemClicked = false;
+            if (!bFocus) {
+                container.timeline._timeline.touch.allowDragging = true;
+                container.timeline._timeline.emit("mouseMove", container.timeline._timeline.getEventProperties(e.event));
+            }
 
         });
         container.timeline._timeline.on("mouseMove", (e) => {
+            if (startPointTime == 0 || container.timeline._timeline.touch.allowDragging)
+                return;
             endPointTime = e.time.getTime();
             endPointY = e.y;
             if (bFocus) {
+                e.event.stopPropagation();
                 this._updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY);
-                e.event.stopImmediatePropagation();
             }
-            else
-                e.event.stopImmediatePropagation = false;
         });
         container.timeline._timeline.on("mouseUp", (e) => {
             endPointTime = e.time.getTime();
