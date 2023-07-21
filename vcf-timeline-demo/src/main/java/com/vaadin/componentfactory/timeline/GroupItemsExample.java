@@ -5,6 +5,7 @@ import com.vaadin.componentfactory.timeline.model.Item;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.html.Div;
@@ -54,8 +55,11 @@ public class GroupItemsExample extends Div {
         VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, groupItems);
         HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
         VerticalLayout selectHighlightRangeLayout = getSelectHighlightRangeLayout(timeline, bAutoZoom);
+        Checkbox focusSelection = new Checkbox("Focus on selection", event -> {
+            timeline.onSetFocusSelectionByDragAndDrop(timeline, event.getValue());
+        });
 
-        add(selectRangeLayout, zoomOptionsLayout, selectHighlightRangeLayout, timeline, log);
+        add(selectRangeLayout, zoomOptionsLayout, selectHighlightRangeLayout,focusSelection, timeline, log);
     }
 
     private boolean cancelMove(List<Item> items) {

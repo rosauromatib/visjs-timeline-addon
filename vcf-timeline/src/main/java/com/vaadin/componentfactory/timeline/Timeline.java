@@ -699,6 +699,13 @@ public class Timeline extends Div {
 //        updateTimelineOptions();
     }
 
+    public void onSetFocusSelectionByDragAndDrop(Timeline container, boolean bFocus){
+        this.getElement()
+                .executeJs(
+                        "vcftimeline.setFocusSelectionByDragAndDrop($0, $1)",
+                        container,bFocus);
+    }
+
     /**
      * Adds a listener for {@link ItemsDragAndDropEvent} to the component.
      *
