@@ -86,7 +86,15 @@ public class TimelineOptions {
   /* The initial end date for the axis of the timeline. If not provided, 
    * the latest date present in the items set is taken as end date. */
   public LocalDateTime end;
-  
+
+  /* The initial start date for the axis of the timeline.
+   * If not provided, the earliest date present in the events is taken as start date. */
+  public LocalDateTime highlightStart;
+
+  /* The initial end date for the axis of the timeline. If not provided,
+   * the latest date present in the items set is taken as end date. */
+  public LocalDateTime highlightEnd;
+
   /* If true, multiple items can be selected using ctrl+click, shift+click, or by holding items.
    * Only applicable when option selectable is true. */
   public boolean multiselect = false;
@@ -132,7 +140,7 @@ public class TimelineOptions {
     js.put("multiselect", multiselect);
     js.put("showTooltips", showTooltips);
     js.put("snapStep", snapStep);
-    js.put("autoZoom", autoZoom);
+    js.put("autoZoom", autoZoom);//highlightStart
     
     js.put("tooltipOnItemUpdateTime", tooltipOnItemUpdateTime);
     Optional.ofNullable(tooltipOnItemUpdateTimeDateFormat).ifPresent(v -> js.put("tooltipOnItemUpdateTimeDateFormat", v.toString()));

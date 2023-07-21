@@ -3,6 +3,7 @@ import '@vaadin/combo-box/theme/lumo/vaadin-combo-box.js';
 import 'Frontend/generated/jar-resources/flow-component-renderer.js';
 import 'Frontend/generated/jar-resources/comboBoxConnector.js';
 import '@vaadin/text-field/theme/lumo/vaadin-text-field.js';
+import '@vaadin/checkbox/theme/lumo/vaadin-checkbox.js';
 import '@vaadin/date-picker/theme/lumo/vaadin-date-picker.js';
 import 'Frontend/generated/jar-resources/datepickerConnector.js';
 import '@vaadin/date-time-picker/theme/lumo/vaadin-date-time-picker.js';
