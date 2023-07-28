@@ -275,6 +275,9 @@ window.vcftimeline = {
         var startPointY = -1000000;
         var endPointY;
 
+        if(bFocus)
+            this._drawRectangleWhenDraging(container);
+
         container.timeline._timeline.on("mouseDown", (e) => {
             startPointTime = e.time.getTime();
             startPointY = e.y;
@@ -599,5 +602,48 @@ window.vcftimeline = {
         if (container.timeline._timeline.options.height == undefined) {
             container.timeline._timeline.options.height = container.timelineHeight;
         }
+    },
+    _drawRectangleWhenDraging: function (container) {
+        var selectionElement = document.getElementById("selection");
+        var startX, startY, endX, endY;
+
+        container.timeline._timeline.on("mouseDown", (e) => {
+
+            startX = e.event.x;
+            startY = e.event.y;
+
+            console.log("mousedown: ", startX, startY);
+
+            selectionElement.style.left = startX + "px";
+            selectionElement.style.top = startY + "px";
+            selectionElement.style.width = "0";
+            selectionElement.style.height = "0";
+            selectionElement.style.display = "block";
+        });
+
+        container.timeline._timeline.on("mouseMove", (e) => {
+
+            if (startX !== undefined && startY !== undefined) {
+                endX = e.event.clientX;
+                endY = e.event.clientY;
+
+                var width = Math.abs(endX - startX);
+                var height = Math.abs(endY - startY);
+
+                console.log("mousemove: ", width, height);
+
+                selectionElement.style.width = width + "px";
+                selectionElement.style.height = height + "px";
+
+                selectionElement.style.left = (endX < startX) ? (startX - width) + "px" : startX + "px";
+                selectionElement.style.top = (endY < startY) ? (startY - height) + "px" : startY + "px";
+            }
+        });
+
+        container.timeline._timeline.on("mouseUp", (e) => {
+            startX = undefined;
+            startY = undefined;
+            selectionElement.style.display = "none";
+        });
     },
 };
