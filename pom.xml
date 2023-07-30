@@ -44,6 +44,11 @@
                 <scope>import</scope>
                 <version>${vaadin.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.rosauromatib</groupId>
+                <artifactId>timeline-addon</artifactId>
+                <version>v1.0.1-alpha</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <repositories>
