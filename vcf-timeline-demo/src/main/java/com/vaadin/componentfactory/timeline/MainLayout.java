@@ -32,13 +32,13 @@ public class MainLayout extends AppLayout {
                 new RouterLink("Tooltip on item update ", TooltipOnUpdateExample.class);
         final RouterLink groupItemsExample =
                 new RouterLink("Group Items ", GroupItemsExample.class);
-        final RouterLink toastUIGridExample =
-                new RouterLink("ToastUI Grid ", ToastUIGridExample.class);
+        // final RouterLink toastUIGridExample =
+        //         new RouterLink("ToastUI Grid ", ToastUIGridExample.class);
 
         final VerticalLayout menuLayout = new VerticalLayout(readonlyEmptyExample, addEmptyItemsExample,
                 resizeItems, dndItems, tooltipsExample, classNameExample, readonlyExample,
                 updateItemContentExample, zoomOptionsExample, overlappExample, tooltipOnUpdateExample,
-                groupItemsExample, toastUIGridExample);
+                groupItemsExample);
 //    final VerticalLayout menuLayout = new VerticalLayout(groupItemsExample);
         addToDrawer(menuLayout);
         addToNavbar(drawerToggle);
