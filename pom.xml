@@ -44,6 +44,11 @@
                 <scope>import</scope>
                 <version>${vaadin.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.rosauromatib</groupId>
+                <artifactId>timeline-addon</artifactId>
+                <version>v1.0.1-alpha</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <repositories>
@@ -60,6 +65,10 @@
         <repository>
             <id>vaadin-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
