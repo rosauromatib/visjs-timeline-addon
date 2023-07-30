@@ -121,7 +121,6 @@ window.vcftimeline = {
         });
 
         container.timeline._timeline.on("tap", (properties) => {
-            console.log("ABC: ", container.timeline._timeline);
             var targetEle = properties.firstTarget.classList.value;
             if (bGroup) {
                 if (!(targetEle.includes("vis-label") || targetEle.includes("vis-inner"))) {
@@ -317,7 +316,6 @@ window.vcftimeline = {
             var startYTemp = startPointY < endPointY ? startPointY : endPointY;
             var endYTemp = startPointY > endPointY ? startPointY : endPointY;
             if (startPointTime != 0) if (startXTemp <= itemArray[i].data.start.getTime() && endXTemp >= itemArray[i].data.end.getTime()) {
-                // console.log("I am here", itemArray[i]);
                 var groupItemTemp = itemset.groups[itemArray[i].parent.groupId];
                 var itemY = groupItemTemp.top + itemArray[i].top;
                 if (startYTemp <= itemY && endYTemp >= itemY + itemArray[i].height) {
@@ -612,8 +610,6 @@ window.vcftimeline = {
             startX = e.event.x;
             startY = e.event.y;
 
-            console.log("mousedown: ", startX, startY);
-
             selectionElement.style.left = startX + "px";
             selectionElement.style.top = startY + "px";
             selectionElement.style.width = "0";
@@ -629,8 +625,6 @@ window.vcftimeline = {
 
                 var width = Math.abs(endX - startX);
                 var height = Math.abs(endY - startY);
-
-                console.log("mousemove: ", width, height);
 
                 selectionElement.style.width = width + "px";
                 selectionElement.style.height = height + "px";
