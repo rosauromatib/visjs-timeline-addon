@@ -73,7 +73,7 @@
  },
  "npmModules": {
   "@lit/reactive-element": "1.6.2",
-  "@open-wc/dedupe-mixin": "1.4.0",
+  "@open-wc/dedupe-mixin": "1.3.1",
   "@polymer/polymer": "3.5.1",
   "@vaadin/a11y-base": "24.1.0",
   "@vaadin/accordion": "24.1.0",
@@ -254,9 +254,9 @@
   "menubarConnector.js": "8ddac5a87155632c516fd16c9402bd9a2fe6d965998169743744842aacdfd412",
   "messageListConnector.js": "480d7092b9fe42aab45756eb4287b2c4b0d6e5d38514e967543bc5c317948c18",
   "selectConnector.js": "bd4277e735d390853603351ddd963233349b702789ddf8ce000df5179bb30523",
-  "src/arrow.js": "e8968df3c503bc073f58160577b2f851b83dbcdce3b164904532b140a45c4b86",
-  "src/vcf-timeline.js": "804122dadf627b115d86dd4d6d088b4e019eeb99c3881b306797ab80d6dd09c8",
-  "styles/timeline.css": "b62e5e87173965d05e6d91c4b783c79d5b500ad4d03716281a7779291f71bbbe",
+  "src/arrow.js": "309a04ae45a30f214fdcd4e856df53a4358988a9bec84c0b087822b8a3dac79d",
+  "src/vcf-timeline.js": "b437b5a4ee9acc07f08b5c8bfe9a3c09c6de4aa778e97c3bae5b0e9e8ff1e29d",
+  "styles/timeline.css": "0801d8f7857edd11f6765ee01e848f5c1eeea6d33a4915bafe0c5c50d4c394a8",
   "theme-util.js": "828ba8154b5d2d762ade6ed6f0614691c68db929b69c3c54250858a077960ba3",
   "tooltip.ts": "b7e9af67169277b94cab722d244340c3a9d463bcf4de2aaa84dddcebbd59447b",
   "vaadin-big-decimal-field.js": "0e0f4e3bb8928c708d02e77d07ede09525102440511942e3b24721702352f140",
@@ -266,12 +266,12 @@
  },
  "themeJsonContents": {},
  "entryScripts": [
-  "VAADIN/build/indexhtml-516744cf.js"
+  "VAADIN/build/indexhtml-47dd1d5b.js"
  ],
  "webComponents": [],
  "cvdlModules": {},
  "packageJsonHash": "16a3b00d391900da4413eb0ee9c0cdea4ab2027ef41e50eec91b2ba40797245b",
  "indexHtmlGenerated": [
-  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-516744cf.js\"></script>"
+  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-47dd1d5b.js\"></script>"
  ]
 }
