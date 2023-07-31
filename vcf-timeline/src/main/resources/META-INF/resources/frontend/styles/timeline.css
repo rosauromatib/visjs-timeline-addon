@@ -30,3 +30,11 @@
     outline: 2px solid red !important;
     z-index: 1000;
 }
+#selection {
+    position: absolute;
+    border: 2px dashed #000;
+    background-color: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    display: none;
+    z-index: 1000;
+}

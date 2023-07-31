@@ -269,35 +269,40 @@ window.vcftimeline = {
     },
 
     setFocusSelectionByDragAndDrop(container, bFocus) {
-        console.log("AAAA: ", bFocus);
-        // if (bFocus) {
-        var bItemClicked = bFocus;
         var startPointTime = 0;
         var endPointTime;
         var startPointY = -1000000;
         var endPointY;
+
+        if(bFocus)
+            this._drawRectangleWhenDraging(container);
+
         container.timeline._timeline.on("mouseDown", (e) => {
             startPointTime = e.time.getTime();
             startPointY = e.y;
-            // if (e.item != null) bItemClicked = true; else bItemClicked = false;
+            if (bFocus) {
+                container.timeline._timeline.touch.allowDragging = false;
+            } else {
+                container.timeline._timeline.touch.allowDragging = true;
+                container.timeline._timeline.emit("mouseMove", container.timeline._timeline.getEventProperties(e.event));
+            }
 
         });
         container.timeline._timeline.on("mouseMove", (e) => {
+            if (startPointTime == 0 || container.timeline._timeline.touch.allowDragging)
+                return;
             endPointTime = e.time.getTime();
             endPointY = e.y;
             if (bFocus) {
+                e.event.stopPropagation();
                 this._updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY);
-                e.event.stopImmediatePropagation();
             }
-            else
-                e.event.stopImmediatePropagation = false;
         });
         container.timeline._timeline.on("mouseUp", (e) => {
             endPointTime = e.time.getTime();
             startPointTime = 0;
             startPointY = -1000000;
         });
-        // }
     },
 
     _updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY) {
@@ -311,7 +316,6 @@ window.vcftimeline = {
             var startYTemp = startPointY < endPointY ? startPointY : endPointY;
             var endYTemp = startPointY > endPointY ? startPointY : endPointY;
             if (startPointTime != 0) if (startXTemp <= itemArray[i].data.start.getTime() && endXTemp >= itemArray[i].data.end.getTime()) {
-                // console.log("I am here", itemArray[i]);
                 var groupItemTemp = itemset.groups[itemArray[i].parent.groupId];
                 var itemY = groupItemTemp.top + itemArray[i].top;
                 if (startYTemp <= itemY && endYTemp >= itemY + itemArray[i].height) {
@@ -596,5 +600,44 @@ window.vcftimeline = {
         if (container.timeline._timeline.options.height == undefined) {
             container.timeline._timeline.options.height = container.timelineHeight;
         }
+    },
+    _drawRectangleWhenDraging: function (container) {
+        var selectionElement = document.getElementById("selection");
+        var startX, startY, endX, endY;
+
+        container.timeline._timeline.on("mouseDown", (e) => {
+
+            startX = e.event.x;
+            startY = e.event.y;
+
+            selectionElement.style.left = startX + "px";
+            selectionElement.style.top = startY + "px";
+            selectionElement.style.width = "0";
+            selectionElement.style.height = "0";
+            selectionElement.style.display = "block";
+        });
+
+        container.timeline._timeline.on("mouseMove", (e) => {
+
+            if (startX !== undefined && startY !== undefined) {
+                endX = e.event.clientX;
+                endY = e.event.clientY;
+
+                var width = Math.abs(endX - startX);
+                var height = Math.abs(endY - startY);
+
+                selectionElement.style.width = width + "px";
+                selectionElement.style.height = height + "px";
+
+                selectionElement.style.left = (endX < startX) ? (startX - width) + "px" : startX + "px";
+                selectionElement.style.top = (endY < startY) ? (startY - height) + "px" : startY + "px";
+            }
+        });
+
+        container.timeline._timeline.on("mouseUp", (e) => {
+            startX = undefined;
+            startY = undefined;
+            selectionElement.style.display = "none";
+        });
     },
 };

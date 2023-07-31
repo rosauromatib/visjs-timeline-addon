@@ -68,7 +68,9 @@
         <pluginRepository>
             <id>vaadin-snapshots</id>
             <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-            <releases><enabled>false</enabled></releases>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </pluginRepository>
     </pluginRepositories>
     <dependencies>
@@ -107,29 +109,33 @@
             </exclusions>
         </dependency>
 
-       <dependency>
-           <groupId>org.vaadin.addons.componentfactory</groupId>
-           <artifactId>vcf-timeline</artifactId>
-           <version>${project.version}</version>
-       </dependency>
+        <dependency>
+            <groupId>org.vaadin.addons.componentfactory</groupId>
+            <artifactId>vcf-timeline</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
         </dependency>
-        
+
         <dependency>
-          <groupId>javax.servlet</groupId>
-          <artifactId>javax.servlet-api</artifactId>
-          <version>4.0.1</version>
-     	</dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-renderer-flow</artifactId>
             <version>24.1.0</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.vaadin.addons</groupId>
+            <artifactId>datefieldext</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>
