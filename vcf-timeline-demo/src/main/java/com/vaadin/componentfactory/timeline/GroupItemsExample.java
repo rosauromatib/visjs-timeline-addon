@@ -55,11 +55,11 @@ public class GroupItemsExample extends Div {
         VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, groupItems);
         HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
         VerticalLayout selectHighlightRangeLayout = getSelectHighlightRangeLayout(timeline, bAutoZoom);
-        Checkbox focusSelection = new Checkbox("Focus on selection", event -> {
-            timeline.onSetFocusSelectionByDragAndDrop(timeline, event.getValue());
-        });
+//        Checkbox focusSelection = new Checkbox("Focus on selection", event -> {
+//            timeline.onSetFocusSelectionByDragAndDrop(timeline, event.getValue());
+//        });
 
-        add(selectRangeLayout, zoomOptionsLayout, selectHighlightRangeLayout,focusSelection, timeline, log);
+        add(selectRangeLayout, zoomOptionsLayout, selectHighlightRangeLayout, timeline, log);
     }
 
     private boolean cancelMove(List<Item> items) {
