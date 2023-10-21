@@ -47,7 +47,7 @@ public class Item {
 
   private String className;
 
-  private String groupId;
+  private String group;
 
   public Item() {}
 
@@ -63,12 +63,12 @@ public class Item {
 
   public Item(LocalDateTime start, LocalDateTime end, String content, int groupId) {
     this(start, end, content);
-    this.setGroupID(String.valueOf(groupId));
+    this.setGroup(String.valueOf(groupId));
   }
 
   public Item(LocalDateTime start, LocalDateTime end,  int groupId) {
     this(start, end);
-    this.setGroupID(String.valueOf(groupId));
+    this.setGroup(String.valueOf(groupId));
     this.setContent("item10000");
   }
 
@@ -144,14 +144,13 @@ public class Item {
     this.className = className;
   }
 
-  public String getGroupID() {
-    return groupId;
+  public String getGroup() {
+    return group;
   }
 
-  public void setGroupID(String groupID) {
-    this.groupId = groupID;
+  public void setGroup(String group) {
+    this.group = group;
   }
-
 
   @Override
   public int hashCode() {
@@ -173,7 +172,7 @@ public class Item {
     Optional.ofNullable(getContent()).ifPresent(v -> js.put("content", v));
     Optional.ofNullable(getStart()).ifPresent(v -> js.put("start", v.toString()));
     Optional.ofNullable(getEnd()).ifPresent(v -> js.put("end", v.toString()));
-    Optional.ofNullable(getGroupID()).ifPresent(v -> js.put("group", v));
+    Optional.ofNullable(getGroup()).ifPresent(v -> js.put("group", v));
 
     Optional.ofNullable(getEditable())
             .ifPresent(

@@ -142,7 +142,7 @@ public class GroupItemsExample extends Div {
         timeline.addGroupItemClickListener(e -> {
             String temp = "";
             for (Item item : items) {
-                if (Integer.parseInt(item.getGroupID()) == Integer.parseInt(e.getGroupId())) {
+                if (Integer.parseInt(item.getGroup()) == Integer.parseInt(e.getGroupId())) {
                     if (!temp.equals(""))
                         temp += "," + item.getId();
                     else
