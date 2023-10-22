@@ -291,11 +291,11 @@ public class GroupItemsExample extends Div {
         return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     }
 
-    private Item createNewItem(LocalDateTime start, LocalDateTime end, String groupID) {
+    private Item createNewItem(LocalDateTime start, LocalDateTime end, int groupID) {
         if (start != null && end != null) {
             if (start.isBefore(end)) {
                 addItemButton.setEnabled(true);
-                return new Item(start, end, Integer.parseInt(groupID));
+                return new Item(start, end, groupID);
             } else {
                 Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
                 return null;

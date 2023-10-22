@@ -39,7 +39,7 @@ import java.util.Optional;
 @Tag("GroupItem")
 public class GroupItem {
 
-    private String groupId;
+    private int groupId;
 
     private String content;
 
@@ -54,7 +54,7 @@ public class GroupItem {
     }
 
     public GroupItem(int groupId, String content, String nestedGroups, boolean visible, int treeLevel) {
-        this.setId(String.valueOf(groupId));
+        this.setId(groupId);
         this.setContent(content);
         this.setNestedGroups(nestedGroups);
         this.setVisible(visible);
@@ -62,18 +62,18 @@ public class GroupItem {
     }
 
     public GroupItem(int groupId, String content, boolean visible, int treeLevel) {
-        this.setId(String.valueOf(groupId));
+        this.setId(groupId);
         this.setContent(content);
         this.setNestedGroups(null);
         this.setVisible(visible);
         this.setTreeLevel(treeLevel);
     }
 
-    public String getGroupId() {
+    public int getGroupId() {
         return groupId;
     }
 
-    public void setId(String groupId) {
+    public void setId(int groupId) {
         this.groupId = groupId;
     }
 
@@ -134,11 +134,11 @@ public class GroupItem {
 
     public String toJSON() {
         JsonObject js = Json.createObject();
-        Optional.ofNullable(getGroupId()).ifPresent(v -> js.put("groupId", v));
+        Optional.of(getGroupId()).ifPresent(v -> js.put("groupId", v));
         Optional.ofNullable(getContent()).ifPresent(v -> js.put("content", v));
-        Optional.ofNullable(getTreeLevel()).ifPresent(v -> js.put("treeLevel", v));
+        Optional.of(getTreeLevel()).ifPresent(v -> js.put("treeLevel", v));
         Optional.ofNullable(getNestedGroups()).ifPresent(v -> js.put("nestedGroups", v));
-        Optional.ofNullable(isVisible()).ifPresent(v -> js.put("visible", v));
+        Optional.of(isVisible()).ifPresent(v -> js.put("visible", v));
         Optional.ofNullable(getClassName()).ifPresent(v -> js.put("className", v));
 
         return js.toJson();
