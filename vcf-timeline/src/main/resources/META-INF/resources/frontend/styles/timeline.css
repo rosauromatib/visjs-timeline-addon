@@ -19,7 +19,15 @@
 .timeline .vis-item .vis-onUpdateTime-tooltip {
     width: auto;
 }
-
+.timeline .vis-item.bg-error {
+    background: red;
+}
+.timeline .vis-item.bg-success {
+    background: blue;
+}
+.timeline .vis-item.bg-warning {
+    background: yellow;
+}
 .vis-nested-group.vis-group-selected {
     background-color: darkgrey !important;
     border: 2px solid red !important;

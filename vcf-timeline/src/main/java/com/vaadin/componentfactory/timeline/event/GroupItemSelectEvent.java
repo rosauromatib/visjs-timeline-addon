@@ -20,13 +20,8 @@
 package com.vaadin.componentfactory.timeline.event;
 
 import com.vaadin.componentfactory.timeline.Timeline;
-import com.vaadin.componentfactory.timeline.model.GroupItem;
 import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.DomEvent;
-import com.vaadin.flow.component.EventData;
 import com.vaadin.flow.component.html.Div;
-
-import java.time.LocalDateTime;
 
 /**
  * Event thrown when an item is resized.

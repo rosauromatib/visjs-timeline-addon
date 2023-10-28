@@ -31,9 +31,6 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.internal.Pair;
-import elemental.json.Json;
-import elemental.json.JsonObject;
-import org.w3c.dom.events.Event;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -55,7 +52,7 @@ import java.util.stream.Collectors;
 public class Timeline extends Div {
 
     private List<Item> items = new ArrayList<>();
-    private List<GroupItem> groupItems = new ArrayList<>();
+    private List<ItemGroup> itemGroups = new ArrayList<>();
 
     private TimelineOptions timelineOptions = new TimelineOptions();
 
@@ -76,10 +73,10 @@ public class Timeline extends Div {
         this.items = new ArrayList<>(items);
     }
 
-    public Timeline(List<Item> items, List<GroupItem> groupItems) {
+    public Timeline(List<Item> items, List<ItemGroup> itemGroups) {
         this();
         this.items = new ArrayList<>(items);
-        this.groupItems = new ArrayList<>(groupItems);
+        this.itemGroups = new ArrayList<>(itemGroups);
     }
 
     public void setUseLineConnector(boolean bUseLine) {
@@ -103,7 +100,7 @@ public class Timeline extends Div {
     }
 
     private void initTimeline() {
-        if (groupItems.size() == 0)
+        if (itemGroups.size() == 0)
             this.getElement()
                     .executeJs(
                             "vcftimeline.create($0, $1, $2)",
@@ -127,8 +124,8 @@ public class Timeline extends Div {
     }
 
     private String convertGroupItemsToJson() {
-        return this.groupItems != null
-                ? this.groupItems.stream().map(groupItems -> groupItems.toJSON()).collect(Collectors.joining(","))
+        return this.itemGroups != null
+                ? this.itemGroups.stream().map(groupItems -> groupItems.toJSON()).collect(Collectors.joining(","))
                 : "";
     }
 

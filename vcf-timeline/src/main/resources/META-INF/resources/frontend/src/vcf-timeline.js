@@ -22,7 +22,7 @@ import moment from "moment";
 
 import {
     DataSet, Timeline,
-} from "vis-timeline/standalone/umd/vis-timeline-graph2d.min.js";
+} from "vis-timeline/standalone/umd/vis-timeline-graph2d.js";
 
 window.vcftimeline = {
     create: function (container, itemsJson, optionsJson) {
@@ -72,7 +72,13 @@ window.vcftimeline = {
                 let type = 0;
 
                 items.add({
-                    id: i, group: parsedItems[i].group, content: "item " + i, start: start, end: end, type: type,
+                    id: i,
+                    group: parsedItems[i].group,
+                    content: parsedItems[i].content,
+                    start: start,
+                    end: end,
+                    type: type,
+                    className: parsedItems[i].className,
                 });
             }
 

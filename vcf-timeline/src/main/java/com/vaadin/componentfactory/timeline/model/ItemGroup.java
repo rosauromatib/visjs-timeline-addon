@@ -20,13 +20,7 @@ package com.vaadin.componentfactory.timeline.model;
  * #L%
  */
 
-import com.vaadin.componentfactory.timeline.event.GroupItemSelectEvent;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ClickNotifier;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Tag;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.shared.Registration;
 import elemental.json.Json;
 import elemental.json.JsonObject;
 
@@ -36,8 +30,8 @@ import java.util.Optional;
 /**
  * Representation of a timeline item.
  */
-@Tag("GroupItem")
-public class GroupItem {
+@Tag("ItemGroup")
+public class ItemGroup {
 
     private int groupId;
 
@@ -50,10 +44,10 @@ public class GroupItem {
     private boolean visible;
     private String className;
 
-    public GroupItem() {
+    public ItemGroup() {
     }
 
-    public GroupItem(int groupId, String content, String nestedGroups, boolean visible, int treeLevel) {
+    public ItemGroup(int groupId, String content, String nestedGroups, boolean visible, int treeLevel) {
         this.setId(groupId);
         this.setContent(content);
         this.setNestedGroups(nestedGroups);
@@ -61,7 +55,7 @@ public class GroupItem {
         this.setTreeLevel(treeLevel);
     }
 
-    public GroupItem(int groupId, String content, boolean visible, int treeLevel) {
+    public ItemGroup(int groupId, String content, boolean visible, int treeLevel) {
         this.setId(groupId);
         this.setContent(content);
         this.setNestedGroups(null);
@@ -128,7 +122,7 @@ public class GroupItem {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        GroupItem other = (GroupItem) obj;
+        ItemGroup other = (ItemGroup) obj;
         return Objects.equals(groupId, other.groupId);
     }
 

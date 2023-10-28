@@ -1,16 +1,12 @@
 package com.vaadin.componentfactory.timeline;
 
-import com.vaadin.componentfactory.timeline.model.GroupItem;
+import com.vaadin.componentfactory.timeline.model.ItemGroup;
 import com.vaadin.componentfactory.timeline.model.Item;
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -21,25 +17,23 @@ import com.vaadin.flow.router.Route;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Route(value = "group-items", layout = MainLayout.class)
-public class GroupItemsExample extends Div {
+public class ItemGroupsExample extends Div {
 
     private Button addItemButton;
     private Item newItem;
 
-    public GroupItemsExample() {
+    public ItemGroupsExample() {
         // for logging changes
         VerticalLayout log = new VerticalLayout();
 
         List<Item> items = getItems();
-        List<GroupItem> groupItems = getGroupItems();
+        List<ItemGroup> itemGroups = getGroupItems();
 
-        Timeline timeline = new Timeline(items, groupItems);
+        Timeline timeline = new Timeline(items, itemGroups);
 
         // setting timeline range
         timeline.setTimelineRange(
@@ -52,7 +46,7 @@ public class GroupItemsExample extends Div {
         // Select Item
         TextField tfSelected = new TextField();
 
-        VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, groupItems);
+        VerticalLayout selectRangeLayout = getSelectRangeLayout(timeline, bAutoZoom, itemGroups);
         HorizontalLayout zoomOptionsLayout = getSelectItemAndZoomOptionLayout(timeline, items, tfSelected, bAutoZoom);
         VerticalLayout selectHighlightRangeLayout = getSelectHighlightRangeLayout(timeline, bAutoZoom);
 //        Checkbox focusSelection = new Checkbox("Focus on selection", event -> {
@@ -112,18 +106,18 @@ public class GroupItemsExample extends Div {
         }
     }
 
-    private VerticalLayout getSelectRangeLayout(Timeline timeline, boolean bAutoZoom, List<GroupItem> groupItems) {
+    private VerticalLayout getSelectRangeLayout(Timeline timeline, boolean bAutoZoom, List<ItemGroup> itemGroups) {
         VerticalLayout selectRangeLayout = new VerticalLayout();
         selectRangeLayout.setSpacing(false);
         Paragraph p = new Paragraph("Select range for new item: ");
         p.getElement().getStyle().set("margin-bottom", "5px");
         selectRangeLayout.add(p);
 
-        ComboBox<GroupItem> comboBox = new ComboBox<>("Group Name");
-        comboBox.setItems(groupItems);
-        comboBox.setItemLabelGenerator(GroupItem::getContent);
+        ComboBox<ItemGroup> comboBox = new ComboBox<>("Group Name");
+        comboBox.setItems(itemGroups);
+        comboBox.setItemLabelGenerator(ItemGroup::getContent);
         comboBox.setRenderer(createRenderer());
-        comboBox.setValue(groupItems.get(0));
+        comboBox.setValue(itemGroups.get(0));
         comboBox.setAllowCustomValue(true);
 
         DateTimePicker datePicker1 = new DateTimePicker("Item start date: ");
@@ -136,19 +130,19 @@ public class GroupItemsExample extends Div {
 
         datePicker1.addValueChangeListener(
                 e -> {
-                    GroupItem selectedGroupItem = comboBox.getValue();
-                    newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+                    ItemGroup selectedItemGroup = comboBox.getValue();
+                    newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedItemGroup.getGroupId());
                 });
         datePicker2.addValueChangeListener(
                 e -> {
-                    GroupItem selectedGroupItem = comboBox.getValue();
-                    newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+                    ItemGroup selectedItemGroup = comboBox.getValue();
+                    newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedItemGroup.getGroupId());
                 });
 
         comboBox.addValueChangeListener(
                 e -> {
-                    GroupItem selectedGroupItem = comboBox.getValue();
-                    newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedGroupItem.getGroupId());
+                    ItemGroup selectedItemGroup = comboBox.getValue();
+                    newItem = createNewItem(datePicker1.getValue(), datePicker2.getValue(), selectedItemGroup.getGroupId());
                 });
 
         HorizontalLayout horizontalLayout = new HorizontalLayout();
@@ -218,6 +212,7 @@ public class GroupItemsExample extends Div {
         item1.setId("0");
         item1.setEditable(true);
         item1.setUpdateTime(true);
+        item1.setClassName("red");
 
         Item item2 = new Item(
                 LocalDateTime.of(2023, 8, 13, 0, 00, 00),
@@ -226,6 +221,7 @@ public class GroupItemsExample extends Div {
         item2.setId("1");
         item2.setEditable(true);
         item2.setUpdateTime(true);
+        item2.setClassName("bg-warning");
 
         Item item3 = new Item(
                 LocalDateTime.of(2023, 8, 14, 2, 30, 00),
@@ -234,6 +230,7 @@ public class GroupItemsExample extends Div {
         item3.setId("2");
         item3.setEditable(true);
         item3.setUpdateTime(true);
+        item3.setClassName("bg-warning");
 
         Item item4 = new Item(
                 LocalDateTime.of(2023, 8, 16, 1, 30, 00),
@@ -242,6 +239,8 @@ public class GroupItemsExample extends Div {
         item4.setId("3");
         item4.setEditable(true);
         item4.setUpdateTime(true);
+        item4.setClassName("bg-warning");
+
         Item item5 = new Item(
                 LocalDateTime.of(2023, 8, 11, 1, 30, 00),
                 LocalDateTime.of(2023, 8, 17, 1, 00, 00),
@@ -249,42 +248,43 @@ public class GroupItemsExample extends Div {
         item5.setId("4");
         item5.setEditable(true);
         item5.setUpdateTime(true);
+        item5.setClassName("bg-warning");
 
         List<Item> items = Arrays.asList(item1, item2, item3, item4, item5);
         return items;
     }
 
-    private List<GroupItem> getGroupItems() {
+    private List<ItemGroup> getGroupItems() {
 
-        GroupItem groupItem1243 = new GroupItem(1243, "Level 3 1243", true, 3);
-        GroupItem groupItem1525 = new GroupItem(1525, "Level 3 1525", true, 3);
-        GroupItem groupItem1624 = new GroupItem(1624, "Level 3 1624", true, 3);
-        GroupItem groupItem2076 = new GroupItem(2076, "Level 3 2076", true, 3);
-        GroupItem groupItem1345 = new GroupItem(1345, "Level 3 1345", true, 3);
-        GroupItem groupItem2078 = new GroupItem(2078, "Level 3 2078", true, 3);
-        GroupItem groupItem1826 = new GroupItem(1826, "Level 3 1826", true, 3);
-        GroupItem groupItem2107 = new GroupItem(2107, "Level 3 2107", true, 3);
-        GroupItem groupItem10 = new GroupItem(10, "Group 10", "1,2,3,4,5,6", true, 1);
-        GroupItem groupItem1 = new GroupItem(1, "North America", "1243,1525,1624,1345,2078,1826,2076,2107",
+        ItemGroup itemGroup1243 = new ItemGroup(1243, "Level 3 1243", true, 3);
+        ItemGroup itemGroup1525 = new ItemGroup(1525, "Level 3 1525", true, 3);
+        ItemGroup itemGroup1624 = new ItemGroup(1624, "Level 3 1624", true, 3);
+        ItemGroup itemGroup2076 = new ItemGroup(2076, "Level 3 2076", true, 3);
+        ItemGroup itemGroup1345 = new ItemGroup(1345, "Level 3 1345", true, 3);
+        ItemGroup itemGroup2078 = new ItemGroup(2078, "Level 3 2078", true, 3);
+        ItemGroup itemGroup1826 = new ItemGroup(1826, "Level 3 1826", true, 3);
+        ItemGroup itemGroup2107 = new ItemGroup(2107, "Level 3 2107", true, 3);
+        ItemGroup itemGroup10 = new ItemGroup(10, "Group 10", "1,2,3,4,5,6", true, 1);
+        ItemGroup itemGroup1 = new ItemGroup(1, "North America", "1243,1525,1624,1345,2078,1826,2076,2107",
                 true, 2);
-        GroupItem groupItem2 = new GroupItem(2, "Latin America", true, 2);
-        GroupItem groupItem3 = new GroupItem(3, "Europe", true, 2);
-        GroupItem groupItem4 = new GroupItem(4, "Asia", true, 2);
-        GroupItem groupItem5 = new GroupItem(5, "Oceania", true, 2);
-        GroupItem groupItem6 = new GroupItem(6, "Africa", true, 2);
-        GroupItem groupItem100 = new GroupItem(100, "Group 100", "101, 102, 103, 104, 105, 106", true, 1);
-        GroupItem groupItem101 = new GroupItem(101, "North America", true, 2);
-        GroupItem groupItem102 = new GroupItem(102, "Latin America", true, 2);
-        GroupItem groupItem103 = new GroupItem(103, "Europe", true, 2);
-        GroupItem groupItem104 = new GroupItem(104, "Asia", true, 2);
-        GroupItem groupItem105 = new GroupItem(105, "Oceania", true, 2);
-        GroupItem groupItem106 = new GroupItem(106, "Africa", true, 2);
+        ItemGroup itemGroup2 = new ItemGroup(2, "Latin America", true, 2);
+        ItemGroup itemGroup3 = new ItemGroup(3, "Europe", true, 2);
+        ItemGroup itemGroup4 = new ItemGroup(4, "Asia", true, 2);
+        ItemGroup itemGroup5 = new ItemGroup(5, "Oceania", true, 2);
+        ItemGroup itemGroup6 = new ItemGroup(6, "Africa", true, 2);
+        ItemGroup itemGroup100 = new ItemGroup(100, "Group 100", "101, 102, 103, 104, 105, 106", true, 1);
+        ItemGroup itemGroup101 = new ItemGroup(101, "North America", true, 2);
+        ItemGroup itemGroup102 = new ItemGroup(102, "Latin America", true, 2);
+        ItemGroup itemGroup103 = new ItemGroup(103, "Europe", true, 2);
+        ItemGroup itemGroup104 = new ItemGroup(104, "Asia", true, 2);
+        ItemGroup itemGroup105 = new ItemGroup(105, "Oceania", true, 2);
+        ItemGroup itemGroup106 = new ItemGroup(106, "Africa", true, 2);
 
-        List<GroupItem> groupItems = Arrays.asList(groupItem10, groupItem1, groupItem1243, groupItem1525, groupItem1624, groupItem2076,
-                groupItem1345, groupItem2078, groupItem1826, groupItem2107,
-                groupItem2, groupItem3, groupItem4, groupItem5, groupItem6, groupItem100, groupItem101,
-                groupItem102, groupItem103, groupItem104, groupItem105, groupItem106);
-        return groupItems;
+        List<ItemGroup> itemGroups = Arrays.asList(itemGroup10, itemGroup1, itemGroup1243, itemGroup1525, itemGroup1624, itemGroup2076,
+                itemGroup1345, itemGroup2078, itemGroup1826, itemGroup2107,
+                itemGroup2, itemGroup3, itemGroup4, itemGroup5, itemGroup6, itemGroup100, itemGroup101,
+                itemGroup102, itemGroup103, itemGroup104, itemGroup105, itemGroup106);
+        return itemGroups;
     }
 
     private String formatDates(LocalDateTime date) {
@@ -306,27 +306,27 @@ public class GroupItemsExample extends Div {
         }
     }
 
-    private Renderer<GroupItem> createRenderer() {
+    private Renderer<ItemGroup> createRenderer() {
         StringBuilder tpl = new StringBuilder();
         tpl.append("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>");
 
-        return LitRenderer.<GroupItem>of(tpl.toString())
-                .withProperty("width", groupItem -> {
-                    if (groupItem.getTreeLevel() == 1)
+        return LitRenderer.<ItemGroup>of(tpl.toString())
+                .withProperty("width", itemGroup -> {
+                    if (itemGroup.getTreeLevel() == 1)
                         return "bolder";
-                    else if (groupItem.getTreeLevel() == 2)
+                    else if (itemGroup.getTreeLevel() == 2)
                         return "bold";
                     else
                         return "normal";
                 })
-                .withProperty("fontsize", groupItem -> {
-                    if (groupItem.getTreeLevel() == 1)
+                .withProperty("fontsize", itemGroup -> {
+                    if (itemGroup.getTreeLevel() == 1)
                         return "1rem";
-                    else if (groupItem.getTreeLevel() == 2)
+                    else if (itemGroup.getTreeLevel() == 2)
                         return "0.9rem";
                     else
                         return "0.8rem";
                 })
-                .withProperty("content", GroupItem::getContent);
+                .withProperty("content", ItemGroup::getContent);
     }
 }
