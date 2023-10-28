@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 @JsModule("./src/arrow.js")
 @JsModule("./src/vcf-timeline.js")
 @CssImport("vis-timeline/styles/vis-timeline-graph2d.min.css")
-@CssImport("./styles/timeline.css")
+@CssImport("./styles/mytimeline.css")
 public class Timeline extends Div {
 
     private List<Item> items = new ArrayList<>();
