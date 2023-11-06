@@ -20,9 +20,7 @@
 import Arrow from "./arrow.js";
 import moment from "moment";
 
-import {
-    DataSet, Timeline,
-} from "vis-timeline/standalone/umd/vis-timeline-graph2d.js";
+import {DataSet, Timeline,} from "vis-timeline/standalone/umd/vis-timeline-graph2d.js";
 
 window.vcftimeline = {
     create: function (container, itemsJson, optionsJson) {
@@ -89,7 +87,7 @@ window.vcftimeline = {
             }
 
         } else items = new DataSet(parsedItems);
-console.log("itemsBefore: ", items);
+        console.log("itemsBefore: ", items);
         // // Get options for timeline configuration
         let options = this._processOptions(container, optionsJson);
         // Create Timeline
@@ -173,18 +171,11 @@ console.log("itemsBefore: ", items);
                 return;
             }
         });
-        // container.timeline._timeline.on("panmove", (e) => {
-        //     if (e && (e.srcEvent.ctrlKey || e.srcEvent.shiftKey)) {
-        //         console.log("here is:");
-        //         return;
-        //     }
-        // });
-        // container.timeline._timeline.on("panend", (e) => {
-        //     if (e && (e.srcEvent.ctrlKey || e.srcEvent.shiftKey)) {
-        //         console.log("here is:");
-        //         return;
-        //     }
-        // });
+
+        let startX, startY = -10000;
+        let startPointY = -10000;
+        let startPointTime, endPointTime = 0;
+        let mouseX;
         container.timeline._timeline.on("mouseDown", (e) => {
             if (e.event.ctrlKey) {
                 let startPointTime = e.time.getTime();
@@ -193,10 +184,12 @@ console.log("itemsBefore: ", items);
                 container.$server.jsAddItem(startPointTime, startPointTime + 2000000, e.group, true);
                 // container.timeline._timeline.touch.allowDragging = false;
             } else if (e.event.shiftKey) {
-                let startPointTime = e.time.getTime();
-                let startPointY = e.y;
+                container.timeline._timeline.range.options.moveable = false;
+                startPointTime = e.time.getTime();
+                startPointY = e.y;
                 container.timeline._timeline.touch.allowDragging = false;
-                this.setFocusSelectionByDragAndDrop(container, true, startPointTime, startPointY, e.event.x, e.event.y);
+                startX = e.event.x;
+                startY = e.event.y;
             } else {
                 container.timeline._timeline.touch.allowDragging = true;
                 container.timeline._timeline.emit("mouseMove", container.timeline._timeline.getEventProperties(e.event));
@@ -224,11 +217,39 @@ console.log("itemsBefore: ", items);
         //         container.timeline._timeline.itemSet.redraw();
         //     }
         // });
-        var mouseX;
-        container.timeline._timeline.on('mouseMove', (properties) => {
-            mouseX = properties.event.clientX;
+
+        container.timeline._timeline.on('mouseMove', (e) => {
+            mouseX = e.event.clientX;
+            if (e.event.shiftKey) {
+                container.timeline._timeline.range.options.moveable = false;
+                let endPointY;
+                let endX = e.event.clientX;
+                let endY = e.event.clientY;
+                if (startX !== -10000 && startY !== -10000)
+                    this._drawRectangleWhenDraging(container, startX, startY, endX, endY);
+                endPointTime = e.time.getTime();
+                endPointY = e.y;
+                this._updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY);
+            }
         });
 
+        container.timeline._timeline.on("mouseUp", (e) => {
+            let selectionElement = document.getElementById("selection");
+            selectionElement.style.display = "none";
+            if (!container.timeline._timeline.range.options.moveable)
+                container.timeline._timeline.range.options.moveable = true;
+            if (e.event.shiftKey) {
+
+                endPointTime = e.time.getTime();
+                startPointTime = 0;
+                startPointY = -1000000;
+                startX = -10000;
+                startY = -10000;
+                startPointY = -10000;
+                startPointTime = 0;
+                endPointTime = 0;
+            }
+        });
 
         setInterval(function () {
             let isDragging = container.timeline._timeline.itemSet.touchParams.itemIsDragging;
@@ -237,8 +258,8 @@ console.log("itemsBefore: ", items);
             let isResizing = isResizingRight !== isResizingLeft;
             if (isDragging) {
                 let multiple = false;
-                    if(container.timeline._timeline.itemSet.touchParams.itemProps)
-                        multiple = container.timeline._timeline.itemSet.touchParams.itemProps.length > 1;
+                if (container.timeline._timeline.itemSet.touchParams.itemProps)
+                    multiple = container.timeline._timeline.itemSet.touchParams.itemProps.length > 1;
                 let itemsInitialXMap = null;
                 let selectedItems = null;
                 if (multiple) {
@@ -321,32 +342,6 @@ console.log("itemsBefore: ", items);
         }, 100);
     },
 
-    setFocusSelectionByDragAndDrop(container, bFocus, startPointTime, startPointY, startX, startY) {
-        // let startPointTime = startPointTime;
-        let endPointTime;
-        // let startPointY = startPointY;
-        let endPointY;
-
-        if (bFocus)
-            this._drawRectangleWhenDraging(container, startX, startY);
-
-        container.timeline._timeline.on("mouseMove", (e) => {
-            if (startPointTime == 0 || container.timeline._timeline.touch.allowDragging)
-                return;
-            endPointTime = e.time.getTime();
-            endPointY = e.y;
-            if (bFocus) {
-                e.event.stopPropagation();
-                this._updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY);
-            }
-        });
-        container.timeline._timeline.on("mouseUp", (e) => {
-            endPointTime = e.time.getTime();
-            startPointTime = 0;
-            startPointY = -1000000;
-        });
-    },
-
     _updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY) {
 
         let itemset = container.timeline._timeline.itemSet;
@@ -427,10 +422,8 @@ console.log("itemsBefore: ", items);
         let defaultOptions = {
             onMove: function (item, callback) {
                 let oldItem = container.timeline._timeline.itemSet.itemsData.get(item.id);
-                console.log("oldItem: ", oldItem);
-                console.log("newItem: ", item);
 
-                let isResizedItem = oldItem.end.getTime() - oldItem.start.getTime() != item.end.getTime() - item.start.getTime();
+                let isResizedItem = oldItem.end.getTime() - oldItem.start.getTime() !== item.end.getTime() - item.start.getTime();
                 let moveItem = true;
 
                 if (isResizedItem && (item.start.getTime() >= item.end.getTime() || item.end.getTime() <= item.start.getTime())) {
@@ -547,8 +540,8 @@ console.log("itemsBefore: ", items);
         itemData.start = parsedItem.start;
         itemData.end = parsedItem.end;
 
-        let calculatedLeft = container.timeline._timeline.itemSet.items[itemId].conversion.toScreen(moment(itemData.start));
-        container.timeline._timeline.itemSet.items[itemId].left = calculatedLeft;
+        container.timeline._timeline.itemSet.items[itemId].left =
+            container.timeline._timeline.itemSet.items[itemId].conversion.toScreen(moment(itemData.start));
 
         container.timeline._timeline.itemsData.update(itemData);
     },
@@ -581,7 +574,7 @@ console.log("itemsBefore: ", items);
         let itemSet = container.timeline._timeline.itemSet;
         let parsedGroups = Object.keys(itemSet.groups);
         for (let anyGroupId = 0; anyGroupId < parsedGroups.length; anyGroupId++) {
-            if (Number.parseInt(parsedGroups[anyGroupId]) != Number.parseInt(groupId)) {
+            if (Number.parseInt(parsedGroups[anyGroupId]) !== Number.parseInt(groupId)) {
                 let tempGroup = itemSet.groupsData.get(Number.parseInt(parsedGroups[anyGroupId]));
                 if (tempGroup != null) {
                     let data = {
@@ -671,44 +664,32 @@ console.log("itemsBefore: ", items);
     },
 
     _updateTimelineHeight: function (container) {
-        if (container.timelineHeight == undefined) {
+        if (container.timelineHeight === undefined) {
             container.timelineHeight = container.timeline._timeline.dom.container.getBoundingClientRect().height;
         }
-        if (container.timeline._timeline.options.height == undefined) {
+        if (container.timeline._timeline.options.height === undefined) {
             container.timeline._timeline.options.height = container.timelineHeight;
         }
     },
-    _drawRectangleWhenDraging: function (container, startX, startY) {
+    _drawRectangleWhenDraging: function (container, startX, startY, endX, endY) {
         let selectionElement = document.getElementById("selection");
-        let endX, endY;
         selectionElement.style.left = startX + "px";
         selectionElement.style.top = startY + "px";
         selectionElement.style.width = "0";
         selectionElement.style.height = "0";
         selectionElement.style.display = "block";
 
-        container.timeline._timeline.on("mouseMove", (e) => {
-            if (!e.event.shiftKey)
-                return;
-            if (startX !== undefined && startY !== undefined) {
-                endX = e.event.clientX;
-                endY = e.event.clientY;
+        if (startX !== undefined && startY !== undefined) {
 
-                let width = Math.abs(endX - startX);
-                let height = Math.abs(endY - startY);
+            let width = Math.abs(endX - startX);
+            let height = Math.abs(endY - startY);
 
-                selectionElement.style.width = width + "px";
-                selectionElement.style.height = height + "px";
+            selectionElement.style.width = width + "px";
+            selectionElement.style.height = height + "px";
 
-                selectionElement.style.left = (endX < startX) ? (startX - width) + "px" : startX + "px";
-                selectionElement.style.top = (endY < startY) ? (startY - height) + "px" : startY + "px";
-            }
-        });
+            selectionElement.style.left = (endX < startX) ? (startX - width) + "px" : startX + "px";
+            selectionElement.style.top = (endY < startY) ? (startY - height) + "px" : startY + "px";
+        }
 
-        container.timeline._timeline.on("mouseUp", (e) => {
-            startX = undefined;
-            startY = undefined;
-            selectionElement.style.display = "none";
-        });
     },
 };
