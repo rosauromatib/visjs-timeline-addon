@@ -35,6 +35,7 @@ import com.vaadin.flow.internal.Pair;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -137,6 +138,16 @@ public class Timeline extends Div {
     public void addItem(Item item, boolean autoZoom) {
         this.getElement().executeJs("vcftimeline.addItem($0, $1, $2)", this, item.toJSON(), autoZoom);
         this.items.add(item);
+    }
+
+    @ClientCallable
+    public void jsAddItem(String start, String end, String group, boolean autoZoom) {
+        LocalDateTime startDateTime = TimelineUtil.convertDateTime(start);
+        LocalDateTime endDateTime = TimelineUtil.convertDateTime(end);
+        Item item = new Item(startDateTime, endDateTime);
+        if (group != null)
+            item.setGroup(group);
+        addItem(item, autoZoom);
     }
 
     public void setItems(List<Item> items, boolean autoZoom) {
@@ -498,9 +509,15 @@ public class Timeline extends Div {
         // save current moved item - itemId - new start and new end
         movedItemsMap.put(itemId, new Pair<>(newStart, newEnd));
         // save original start and end for the moved item
-        Item movedItem = items.stream().filter(i -> itemId.equals(i.getId())).findFirst().get();
-        movedItemsOldValuesMap.put(itemId, new Pair<>(movedItem.getStart(), movedItem.getEnd()));
+        Optional<Item> optionalItem = items.stream()
+                .filter(i -> itemId.equals(i.getId()))
+                .findFirst();
 
+        if (optionalItem.isPresent()) {
+            Item movedItem = optionalItem.get();
+            movedItemsOldValuesMap.put(itemId, new Pair<>(movedItem.getStart(), movedItem.getEnd()));
+            // Continue processing with movedItem
+        }
         // if all selected items have been processed
         if (selectedItemsIdsList.size() == movedItemsMap.size()) {
             // update items with new start and end range values
@@ -696,11 +713,11 @@ public class Timeline extends Div {
 //        updateTimelineOptions();
     }
 
-    public void onSetFocusSelectionByDragAndDrop(Timeline container, boolean bFocus){
+    public void onSetFocusSelectionByDragAndDrop(Timeline container, boolean bFocus) {
         this.getElement()
                 .executeJs(
                         "vcftimeline.setFocusSelectionByDragAndDrop($0, $1)",
-                        container,bFocus);
+                        container, bFocus);
     }
 
     /**

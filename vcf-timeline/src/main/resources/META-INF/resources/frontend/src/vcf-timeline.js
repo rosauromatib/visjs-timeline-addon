@@ -36,6 +36,7 @@ window.vcftimeline = {
     _createTimeline: function (container, itemsJson, groupsJson, optionsJson) {
         // parsed items
         let parsedItems = JSON.parse(itemsJson);
+        console.log("parseditems: ", parsedItems);
         let items;
         let groupItems = new DataSet();
         let bGroup = false;
@@ -67,54 +68,58 @@ window.vcftimeline = {
             items = new DataSet();
             let types = ["box", "point", "range", "background"];
             for (let i = 0; i < parsedItems.length; i++) {
-                let start = parsedItems[i].start;
-                let end = parsedItems[i].end;
                 let type = 0;
 
                 items.add({
                     id: i,
                     group: parsedItems[i].group,
                     content: parsedItems[i].content,
-                    start: start,
-                    end: end,
+                    start: parsedItems[i].start,
+                    end: parsedItems[i].end,
+                    editable: {
+                        add: true,
+                        updateTime: true,
+                        updateGroup: true,
+                        remove: true,
+                    },
+                    selectable: true,
                     type: type,
-                    className: parsedItems[i].className,
+                    className: parsedItems[i].className + ' vis-delete',
                 });
             }
 
         } else items = new DataSet(parsedItems);
-
+console.log("itemsBefore: ", items);
         // // Get options for timeline configuration
         let options = this._processOptions(container, optionsJson);
         // Create Timeline
         let timeline;
         if (bGroup) {
-            let startDay = moment().startOf("month").startOf("week").isoWeekday(1);
-            let options1 = {
-                start: startDay.toDate(),
-                end: new Date(1000 * 60 * 60 * 24 + new Date().valueOf()),
-                horizontalScroll: true,
-                zoomKey: "ctrlKey",
-                orientation: "both",
-                zoomMin: 1000 * 60 * 60 * 240,
-            };
+            // let startDay = moment().startOf("month").startOf("week").isoWeekday(1);
+            // let options1 = {
+            //     start: startDay.toDate(),
+            //     end: new Date(1000 * 60 * 60 * 24 + new Date().valueOf()),
+            //     horizontalScroll: true,
+            //     zoomKey: "ctrlKey",
+            //     orientation: "both",
+            //     zoomMin: 1000 * 60 * 60 * 240,
+            // };
             timeline = new Timeline(container, items, groupItems, options);
         } else timeline = new Timeline(container, items, options);
 
         const line_timeline = new Arrow(timeline, bGroup);
         container.timeline = line_timeline;
 
+        console.log("line_timeline: ", line_timeline);
+
         let group = null;
         let bodyClicked = false;
 
         container.timeline._timeline.on("select", (properties) => {
             let temp = properties.items.toString();
+            console.log("properties: ", properties);
             container.$server.onSelect(temp.replace(" ", ""));
         });
-
-        // container.timeline._timeline.on("groupOnClick", (properties) => {
-        //     // container.$server.onSelectItemInGroup(properties.groupId);
-        // });
 
         container.timeline._timeline.itemSet.groupHammer.on("tap", (properties) => {
             let itemSet = container.timeline._timeline.itemSet;
@@ -145,8 +150,8 @@ window.vcftimeline = {
         });
 
         container.timeline._timeline.on("_change", (properties) => {
-            if (properties) {
-                this._updateGroupClassName(container, group, "vis-group-selected");
+            if (properties && group) {
+                this._updateGroupClassName(container, {id: group}, "vis-group-selected");
                 // bodyClicked = true;
             }
         });
@@ -161,9 +166,33 @@ window.vcftimeline = {
         // let endPointTime;
         // let startPointY = -1000000;
         // let endPointY;
-        container.timeline._timeline.on("mouseDown", (e) => {
-            if (e.event.shiftKey) {
 
+        container.timeline._timeline.on("pan", (e) => {
+            if (e.srcEvent.ctrlKey || e.srcEvent.shiftKey) {
+                container.timeline._timeline.range.options.moveable = false;
+                return;
+            }
+        });
+        // container.timeline._timeline.on("panmove", (e) => {
+        //     if (e && (e.srcEvent.ctrlKey || e.srcEvent.shiftKey)) {
+        //         console.log("here is:");
+        //         return;
+        //     }
+        // });
+        // container.timeline._timeline.on("panend", (e) => {
+        //     if (e && (e.srcEvent.ctrlKey || e.srcEvent.shiftKey)) {
+        //         console.log("here is:");
+        //         return;
+        //     }
+        // });
+        container.timeline._timeline.on("mouseDown", (e) => {
+            if (e.event.ctrlKey) {
+                let startPointTime = e.time.getTime();
+                if (e.group)
+                    group = e.group;
+                container.$server.jsAddItem(startPointTime, startPointTime + 2000000, e.group, true);
+                // container.timeline._timeline.touch.allowDragging = false;
+            } else if (e.event.shiftKey) {
                 let startPointTime = e.time.getTime();
                 let startPointY = e.y;
                 container.timeline._timeline.touch.allowDragging = false;
@@ -174,18 +203,31 @@ window.vcftimeline = {
             }
         });
         // container.timeline._timeline.on("mouseMove", (e) => {
-        //     endPointTime = e.time.getTime();
-        //     endPointY = e.y;
-        //     if (!bItemClicked) {
-        //         e.event.stopPropagation();
-        //         this._updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY);
-        //     }
+        //     // if (e.event.ctrlKey) {
+        //     //     let temp = container.timeline._timeline.itemSet.itemFromTarget(e.event);
+        //     //     console.log("Temp: ", temp);
+        //     //     // container.timeline._timeline.touch.allowDragging = true;
+        //     //     let item = container.timeline._timeline.itemSet.itemsData.get(Object.keys(container.timeline._timeline.itemSet.items).length - 1);
+        //     //     item.end = e.time.getTime();
+        //     //     container.timeline._timeline.fit();
+        //     // }
         // });
         // container.timeline._timeline.on("mouseUp", (e) => {
-        //     endPointTime = e.time.getTime();
-        //     startPointTime = 0;
-        //     startPointY = -1000000;
+        //     if (!container.timeline._timeline.range.options.moveable)
+        //         container.timeline._timeline.range.options.moveable = true;
+        //     if (e.event.ctrlKey) {
+        //         let temp = container.timeline._timeline.itemSet.itemFromTarget(e.event);
+        //         console.log("Temp: ", container.timeline._timeline.itemSet.touchParams);
+        //         // container.timeline._timeline.touch.allowDragging = true;
+        //         let item = container.timeline._timeline.itemSet.itemsData.get(Object.keys(container.timeline._timeline.itemSet.items).length - 1);
+        //         item.end = e.time.getTime();
+        //         container.timeline._timeline.itemSet.redraw();
+        //     }
         // });
+        var mouseX;
+        container.timeline._timeline.on('mouseMove', (properties) => {
+            mouseX = properties.event.clientX;
+        });
 
 
         setInterval(function () {
@@ -194,7 +236,9 @@ window.vcftimeline = {
             let isResizingLeft = container.timeline._timeline.itemSet.touchParams.dragLeftItem;
             let isResizing = isResizingRight !== isResizingLeft;
             if (isDragging) {
-                let multiple = container.timeline._timeline.itemSet.touchParams.itemProps.length > 1;
+                let multiple = false;
+                    if(container.timeline._timeline.itemSet.touchParams.itemProps)
+                        multiple = container.timeline._timeline.itemSet.touchParams.itemProps.length > 1;
                 let itemsInitialXMap = null;
                 let selectedItems = null;
                 if (multiple) {
@@ -286,18 +330,6 @@ window.vcftimeline = {
         if (bFocus)
             this._drawRectangleWhenDraging(container, startX, startY);
 
-        // container.timeline._timeline.on("mouseDown", (e) => {
-        //     console.log("BBBB: ", e);
-        //     startPointTime = e.time.getTime();
-        //     startPointY = e.y;
-        //     if (bFocus) {
-        //         container.timeline._timeline.touch.allowDragging = false;
-        //     } else {
-        //         container.timeline._timeline.touch.allowDragging = true;
-        //         container.timeline._timeline.emit("mouseMove", container.timeline._timeline.getEventProperties(e.event));
-        //     }
-        //
-        // });
         container.timeline._timeline.on("mouseMove", (e) => {
             if (startPointTime == 0 || container.timeline._timeline.touch.allowDragging)
                 return;
@@ -395,6 +427,8 @@ window.vcftimeline = {
         let defaultOptions = {
             onMove: function (item, callback) {
                 let oldItem = container.timeline._timeline.itemSet.itemsData.get(item.id);
+                console.log("oldItem: ", oldItem);
+                console.log("newItem: ", item);
 
                 let isResizedItem = oldItem.end.getTime() - oldItem.start.getTime() != item.end.getTime() - item.start.getTime();
                 let moveItem = true;
@@ -433,7 +467,13 @@ window.vcftimeline = {
         }
 
         if (tooltipOnItemUpdateTime) {
-            (options.editable = {updateTime: true}), (options.tooltipOnItemUpdateTime = {
+            (options.editable = {
+                add: true,
+                updateTime: true,
+                updateGroup: true,
+                remove: true,
+                overrideItems: false
+            }), (options.tooltipOnItemUpdateTime = {
                 template: function (item) {
                     let startDate = moment(item.start).format("MM/DD/YYYY HH:mm");
                     let endDate = moment(item.end).format("MM/DD/YYYY HH:mm");
@@ -471,15 +511,25 @@ window.vcftimeline = {
     },
 
     addItem: function (container, newItemJson, autoZoom) {
-        let parsedItems = JSON.parse(newItemJson);
-        container.timeline._timeline.itemsData.add({
+        let parsedItem = JSON.parse(newItemJson);
+        let item = {
             id: Object.keys(container.timeline._timeline.itemSet.items).length,
-            group: Number.parseInt(parsedItems.group),
+            group: Number.parseInt(parsedItem.group),
             content: "item " + Object.keys(container.timeline._timeline.itemSet.items).length,
-            start: parsedItems.start,
-            end: parsedItems.end,
+            editable: {
+                add: true,
+                updateTime: true,
+                updateGroup: true,
+                remove: true,
+                overrideItems: false
+            },
+            selectable: true,
+            start: parsedItem.start,
+            end: parsedItem.end,
             type: 0,
-        });
+        };
+        console.log("Item: ", container.timeline._timeline.itemsData);
+        container.timeline._timeline.itemsData.add(item);
         if (autoZoom) {
             container.timeline._timeline.fit();
         }

@@ -19,15 +19,19 @@
 .timeline .vis-item .vis-onUpdateTime-tooltip {
     width: auto;
 }
+
 .timeline .vis-item.bg-error {
     background: red;
 }
+
 .timeline .vis-item.bg-success {
     background: blue;
 }
+
 .timeline .vis-item.bg-warning {
     background: yellow;
 }
+
 .vis-nested-group.vis-group-selected {
     background-color: darkgrey !important;
     border: 2px solid red !important;
@@ -39,6 +43,7 @@
     border-right: 2px solid red !important;
     z-index: 1000;
 }
+
 #selection {
     position: absolute;
     border: 2px dashed #000;
@@ -47,3 +52,16 @@
     display: none;
     z-index: 1000;
 }
+
+/*.vis-selected.vis-item.vis-delete-rtl:after, .vis-selected.vis-item.vis-delete:after {*/
+/*    content: '\00D7';*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    right: -24px;*/
+/*    color: red;*/
+/*    padding: 2px 5px;*/
+/*    cursor: pointer;*/
+/*    font-family: arial, sans-serif;*/
+/*    font-size: 22px;*/
+/*    font-weight: 700;*/
+/*}*/
