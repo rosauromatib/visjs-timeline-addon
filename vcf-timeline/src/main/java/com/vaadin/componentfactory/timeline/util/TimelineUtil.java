@@ -38,4 +38,8 @@ public class TimelineUtil {
         Instant date = Instant.ofEpochMilli(timestamp);
         return LocalDateTime.ofInstant(date, ZoneId.systemDefault());
     }
+
+    public static String formatDates(LocalDateTime date) {
+        return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+    }
 }

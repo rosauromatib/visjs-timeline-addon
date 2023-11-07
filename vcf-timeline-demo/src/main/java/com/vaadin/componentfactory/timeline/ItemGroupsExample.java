@@ -16,7 +16,6 @@ import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.Route;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class ItemGroupsExample extends Div {
 
         // setting timeline range
         timeline.setTimelineRange(
-                LocalDateTime.of(2023, 1, 1, 00, 00, 00), LocalDateTime.of(2023, 9, 25, 00, 00, 00));
+                LocalDateTime.of(2023, 1, 1, 0, 0, 0), LocalDateTime.of(2023, 9, 25, 0, 0, 0));
 
         timeline.setMultiselect(true);
         timeline.setStack(true);
@@ -56,10 +55,6 @@ public class ItemGroupsExample extends Div {
         add(selectRangeLayout, zoomOptionsLayout, selectHighlightRangeLayout, timeline, log);
     }
 
-    private boolean cancelMove(List<Item> items) {
-        return items.stream().anyMatch(i -> i.getId().equals("0") || i.getId().equals("3"));
-    }
-
     private VerticalLayout getSelectHighlightRangeLayout(Timeline timeline, boolean bAutoZoom) {
         VerticalLayout selectRangeLayout = new VerticalLayout();
         selectRangeLayout.setSpacing(false);
@@ -68,22 +63,22 @@ public class ItemGroupsExample extends Div {
         selectRangeLayout.add(p);
 
         DateTimePicker startRange = new DateTimePicker("Focus start date: ");
-        startRange.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
-        startRange.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
+        startRange.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
+        startRange.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
 
         DateTimePicker endRange = new DateTimePicker("Focus end date: ");
-        endRange.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
-        endRange.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
+        endRange.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
+        endRange.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
 
         startRange.addValueChangeListener(
                 e -> {
                     timeline.setHighlightStart(startRange.getValue());
-                    this.createHighLightRange(timeline, startRange.getValue(), endRange.getValue(), startRange, endRange);
+//                    this.createHighLightRange(timeline, startRange.getValue(), endRange.getValue(), startRange, endRange);
                 });
         endRange.addValueChangeListener(
                 e -> {
                     timeline.setHighlightEnd(endRange.getValue());
-                    this.createHighLightRange(timeline, startRange.getValue(), endRange.getValue(), startRange, endRange);
+//                    this.createHighLightRange(timeline, startRange.getValue(), endRange.getValue(), startRange, endRange);
                 });
 
 
@@ -93,18 +88,17 @@ public class ItemGroupsExample extends Div {
         return selectRangeLayout;
     }
 
-    private void createHighLightRange(Timeline timeline, LocalDateTime start, LocalDateTime end, DateTimePicker startRange, DateTimePicker endRange) {
-        if (start != null && end != null) {
-            if (start.isBefore(end)) {
-                timeline.onSetHighlightRange(timeline, start, end);
-                startRange.clear();
-                endRange.clear();
-            } else {
-                Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
-            }
-        } else {
-        }
-    }
+//    private void createHighLightRange(Timeline timeline, LocalDateTime start, LocalDateTime end, DateTimePicker startRange, DateTimePicker endRange) {
+//        if (start != null && end != null) {
+//            if (start.isBefore(end)) {
+//                timeline.onSetHighlightRange(timeline, start, end);
+//                startRange.clear();
+//                endRange.clear();
+//            } else {
+//                Notification.show("End date should be after start date", 5000, Notification.Position.MIDDLE);
+//            }
+//        }
+//    }
 
     private VerticalLayout getSelectRangeLayout(Timeline timeline, boolean bAutoZoom, List<ItemGroup> itemGroups) {
         VerticalLayout selectRangeLayout = new VerticalLayout();
@@ -121,12 +115,12 @@ public class ItemGroupsExample extends Div {
         comboBox.setAllowCustomValue(true);
 
         DateTimePicker datePicker1 = new DateTimePicker("Item start date: ");
-        datePicker1.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
-        datePicker1.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
+        datePicker1.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
+        datePicker1.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
 
         DateTimePicker datePicker2 = new DateTimePicker("Item end date: ");
-        datePicker2.setMin(LocalDateTime.of(2023, 1, 10, 00, 00, 00));
-        datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 00, 00, 00));
+        datePicker2.setMin(LocalDateTime.of(2023, 1, 10, 0, 0, 0));
+        datePicker2.setMax(LocalDateTime.of(2023, 8, 22, 0, 0, 0));
 
         datePicker1.addValueChangeListener(
                 e -> {
@@ -166,9 +160,7 @@ public class ItemGroupsExample extends Div {
 
     private HorizontalLayout getSelectItemAndZoomOptionLayout(Timeline timeline, List<Item> items, TextField textField, boolean bAutoZoom) {
         VerticalLayout selectLayout = new VerticalLayout();
-        Button setSelectBtn = new Button("Select Item", e -> {
-            timeline.setSelectItem(textField.getValue());
-        });
+        Button setSelectBtn = new Button("Select Item", e -> timeline.setSelectItem(textField.getValue()));
         selectLayout.add(textField, setSelectBtn);
 
         HorizontalLayout zoomOptionsLayout = new HorizontalLayout();
@@ -206,8 +198,8 @@ public class ItemGroupsExample extends Div {
 
     private List<Item> getItems() {
         Item item1 = new Item(
-                LocalDateTime.of(2023, 8, 11, 2, 30, 00),
-                LocalDateTime.of(2023, 8, 11, 7, 00, 00),
+                LocalDateTime.of(2023, 8, 11, 2, 30, 0),
+                LocalDateTime.of(2023, 8, 11, 7, 0, 0),
                 "Item 1", 1);
         item1.setId("0");
         item1.setEditable(true);
@@ -215,8 +207,8 @@ public class ItemGroupsExample extends Div {
         item1.setClassName("red");
 
         Item item2 = new Item(
-                LocalDateTime.of(2023, 8, 13, 0, 00, 00),
-                LocalDateTime.of(2023, 8, 13, 12, 00, 00),
+                LocalDateTime.of(2023, 8, 13, 0, 0, 0),
+                LocalDateTime.of(2023, 8, 13, 12, 0, 0),
                 "Item 2", 6);
         item2.setId("1");
         item2.setEditable(true);
@@ -224,8 +216,8 @@ public class ItemGroupsExample extends Div {
         item2.setClassName("bg-warning");
 
         Item item3 = new Item(
-                LocalDateTime.of(2023, 8, 14, 2, 30, 00),
-                LocalDateTime.of(2023, 8, 15, 1, 00, 00),
+                LocalDateTime.of(2023, 8, 14, 2, 30, 0),
+                LocalDateTime.of(2023, 8, 15, 1, 0, 0),
                 "Item 3", 100);
         item3.setId("2");
         item3.setEditable(true);
@@ -233,8 +225,8 @@ public class ItemGroupsExample extends Div {
         item3.setClassName("bg-warning");
 
         Item item4 = new Item(
-                LocalDateTime.of(2023, 8, 16, 1, 30, 00),
-                LocalDateTime.of(2023, 8, 17, 1, 00, 00),
+                LocalDateTime.of(2023, 8, 16, 1, 30, 0),
+                LocalDateTime.of(2023, 8, 17, 1, 0, 0),
                 "Item 4", 106);
         item4.setId("3");
         item4.setEditable(true);
@@ -242,16 +234,15 @@ public class ItemGroupsExample extends Div {
         item4.setClassName("bg-warning");
 
         Item item5 = new Item(
-                LocalDateTime.of(2023, 8, 11, 1, 30, 00),
-                LocalDateTime.of(2023, 8, 17, 1, 00, 00),
+                LocalDateTime.of(2023, 8, 11, 1, 30, 0),
+                LocalDateTime.of(2023, 8, 17, 1, 0, 0),
                 "Item 5", 1);
         item5.setId("4");
         item5.setEditable(true);
         item5.setUpdateTime(true);
         item5.setClassName("bg-warning");
 
-        List<Item> items = Arrays.asList(item1, item2, item3, item4, item5);
-        return items;
+        return Arrays.asList(item1, item2, item3, item4, item5);
     }
 
     private List<ItemGroup> getGroupItems() {
@@ -280,15 +271,10 @@ public class ItemGroupsExample extends Div {
         ItemGroup itemGroup105 = new ItemGroup(105, "Oceania", true, 2);
         ItemGroup itemGroup106 = new ItemGroup(106, "Africa", true, 2);
 
-        List<ItemGroup> itemGroups = Arrays.asList(itemGroup10, itemGroup1, itemGroup1243, itemGroup1525, itemGroup1624, itemGroup2076,
+        return Arrays.asList(itemGroup10, itemGroup1, itemGroup1243, itemGroup1525, itemGroup1624, itemGroup2076,
                 itemGroup1345, itemGroup2078, itemGroup1826, itemGroup2107,
                 itemGroup2, itemGroup3, itemGroup4, itemGroup5, itemGroup6, itemGroup100, itemGroup101,
                 itemGroup102, itemGroup103, itemGroup104, itemGroup105, itemGroup106);
-        return itemGroups;
-    }
-
-    private String formatDates(LocalDateTime date) {
-        return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     }
 
     private Item createNewItem(LocalDateTime start, LocalDateTime end, int groupID) {
@@ -307,10 +293,8 @@ public class ItemGroupsExample extends Div {
     }
 
     private Renderer<ItemGroup> createRenderer() {
-        StringBuilder tpl = new StringBuilder();
-        tpl.append("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>");
 
-        return LitRenderer.<ItemGroup>of(tpl.toString())
+        return LitRenderer.<ItemGroup>of("<span style= \"font-weight: ${item.width}; font-size: ${item.fontsize}\">${item.content}</span>")
                 .withProperty("width", itemGroup -> {
                     if (itemGroup.getTreeLevel() == 1)
                         return "bolder";
