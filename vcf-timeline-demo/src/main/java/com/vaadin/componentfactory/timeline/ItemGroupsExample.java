@@ -187,17 +187,17 @@ public class ItemGroupsExample extends Div {
         );
 
         timeline.addGroupItemClickListener(e -> {
-            String temp = "";
-            for (Item item : items) {
+            StringBuilder temp = new StringBuilder();
+            for (Item item : timeline.getItems()) {
                 if (Integer.parseInt(item.getGroup()) == Integer.parseInt(e.getGroupId())) {
-                    if (!temp.equals(""))
-                        temp += "," + item.getId();
+                    if (!temp.isEmpty())
+                        temp.append(",").append(item.getId());
                     else
-                        temp += item.getId();
+                        temp.append(item.getId());
 
                 }
             }
-            e.getTimeline().onSelectItem(e.getTimeline(), temp, false);
+            e.getTimeline().onSelectItem(e.getTimeline(), temp.toString(), false);
         });
 
 

@@ -34,7 +34,6 @@ window.vcftimeline = {
     _createTimeline: function (container, itemsJson, groupsJson, optionsJson) {
         // parsed items
         let parsedItems = JSON.parse(itemsJson);
-        console.log("parseditems: ", parsedItems);
         let items;
         let groupItems = new DataSet();
         let bGroup = false;
@@ -64,30 +63,26 @@ window.vcftimeline = {
                 });
             }
             items = new DataSet();
-            let types = ["box", "point", "range", "background"];
+            // let types = ["box", "point", "range", "background"];
             for (let i = 0; i < parsedItems.length; i++) {
                 let type = 0;
 
                 items.add({
-                    id: i,
+                    id: parsedItems[i].id,
                     group: parsedItems[i].group,
                     content: parsedItems[i].content,
                     start: parsedItems[i].start,
                     end: parsedItems[i].end,
                     editable: {
-                        add: true,
-                        updateTime: true,
-                        updateGroup: true,
-                        remove: true,
+                        add: true, updateTime: true, updateGroup: true, remove: true,
                     },
                     selectable: true,
                     type: type,
-                    className: parsedItems[i].className + ' vis-delete',
+                    className: parsedItems[i].className,
                 });
             }
 
         } else items = new DataSet(parsedItems);
-        console.log("itemsBefore: ", items);
         // // Get options for timeline configuration
         let options = this._processOptions(container, optionsJson);
         // Create Timeline
@@ -105,28 +100,18 @@ window.vcftimeline = {
             timeline = new Timeline(container, items, groupItems, options);
         } else timeline = new Timeline(container, items, options);
 
-        const line_timeline = new Arrow(timeline, bGroup);
-        container.timeline = line_timeline;
-
-        console.log("line_timeline: ", line_timeline);
+        container.timeline = new Arrow(timeline, bGroup);
 
         let group = null;
         let bodyClicked = false;
 
+
         container.timeline._timeline.on("select", (properties) => {
+            if (!properties.items || properties.items.length === 0)
+                return;
             let temp = properties.items.toString();
-            console.log("properties: ", properties);
+
             container.$server.onSelect(temp.replace(" ", ""));
-        });
-
-        container.timeline._timeline.itemSet.groupHammer.on("tap", (properties) => {
-            let itemSet = container.timeline._timeline.itemSet;
-            let temp = itemSet.groupFromTarget(properties);
-            group = itemSet.groupsData.get(temp.groupId);
-
-            container.$server.onSelectItemInGroup(group.id);
-            if (!group.nestedGroups) this._updateGroupClassName(container, group, "vis-group-selected");
-
         });
 
         container.timeline._timeline.on("tap", (properties) => {
@@ -138,7 +123,6 @@ window.vcftimeline = {
                     if (tempGroup) {
                         let group = itemSet.groupsData.get(tempGroup.groupId);
 
-                        // container.$server.onSelectItemInGroup(group.id);
                         bodyClicked = true;
 
                         this._updateGroupClassName(container, group, "vis-group-selected");
@@ -147,11 +131,13 @@ window.vcftimeline = {
             }
         });
 
-        container.timeline._timeline.on("_change", (properties) => {
-            if (properties && group) {
-                this._updateGroupClassName(container, {id: group}, "vis-group-selected");
-                // bodyClicked = true;
-            }
+        container.timeline._timeline.itemSet.groupHammer.on("tap", (properties) => {
+            let itemSet = container.timeline._timeline.itemSet;
+            let temp = itemSet.groupFromTarget(properties.srcEvent);
+            group = itemSet.groupsData.get(temp.groupId);
+            container.$server.onSelectItemInGroup(group.id);
+            if (!group.nestedGroups) this._updateGroupClassName(container, group, "vis-group-selected");
+
         });
 
         container.timeline._timeline.on("changed", () => {
@@ -159,88 +145,64 @@ window.vcftimeline = {
             this._updateTimelineHeight(container);
         });
 
-        // let bItemClicked = false;
-        // let startPointTime = 0;
-        // let endPointTime;
-        // let startPointY = -1000000;
-        // let endPointY;
-
-        container.timeline._timeline.on("pan", (e) => {
-            if (e.srcEvent.ctrlKey || e.srcEvent.shiftKey) {
-                container.timeline._timeline.range.options.moveable = false;
-                return;
-            }
-        });
-
         let startX, startY = -10000;
         let startPointY = -10000;
         let startPointTime, endPointTime = 0;
         let mouseX;
         container.timeline._timeline.on("mouseDown", (e) => {
-            if (e.event.ctrlKey) {
-                let startPointTime = e.time.getTime();
-                if (e.group)
-                    group = e.group;
-                container.$server.jsAddItem(startPointTime, startPointTime + 2000000, e.group, true);
-                // container.timeline._timeline.touch.allowDragging = false;
-            } else if (e.event.shiftKey) {
+            startPointTime = e.time.getTime();
+            startPointY = e.y;
+            startX = e.event.x;
+            startY = e.event.y;
+            if (e.event.shiftKey || e.event.ctrlKey) {
+                // let startPointTime = e.time.getTime();
+                // if (e.group) group = e.group;
+                // container.$server.jsAddItem(startPointTime, startPointTime + 2000000, e.group.toString(), true);
                 container.timeline._timeline.range.options.moveable = false;
-                startPointTime = e.time.getTime();
-                startPointY = e.y;
                 container.timeline._timeline.touch.allowDragging = false;
-                startX = e.event.x;
-                startY = e.event.y;
-            } else {
-                container.timeline._timeline.touch.allowDragging = true;
-                container.timeline._timeline.emit("mouseMove", container.timeline._timeline.getEventProperties(e.event));
+                window.vcftimeline.startPointTime = startPointTime;
+                window.vcftimeline.isMouseDown = true;
             }
         });
-        // container.timeline._timeline.on("mouseMove", (e) => {
-        //     // if (e.event.ctrlKey) {
-        //     //     let temp = container.timeline._timeline.itemSet.itemFromTarget(e.event);
-        //     //     console.log("Temp: ", temp);
-        //     //     // container.timeline._timeline.touch.allowDragging = true;
-        //     //     let item = container.timeline._timeline.itemSet.itemsData.get(Object.keys(container.timeline._timeline.itemSet.items).length - 1);
-        //     //     item.end = e.time.getTime();
-        //     //     container.timeline._timeline.fit();
-        //     // }
-        // });
-        // container.timeline._timeline.on("mouseUp", (e) => {
-        //     if (!container.timeline._timeline.range.options.moveable)
-        //         container.timeline._timeline.range.options.moveable = true;
-        //     if (e.event.ctrlKey) {
-        //         let temp = container.timeline._timeline.itemSet.itemFromTarget(e.event);
-        //         console.log("Temp: ", container.timeline._timeline.itemSet.touchParams);
-        //         // container.timeline._timeline.touch.allowDragging = true;
-        //         let item = container.timeline._timeline.itemSet.itemsData.get(Object.keys(container.timeline._timeline.itemSet.items).length - 1);
-        //         item.end = e.time.getTime();
-        //         container.timeline._timeline.itemSet.redraw();
-        //     }
-        // });
 
         container.timeline._timeline.on('mouseMove', (e) => {
             mouseX = e.event.clientX;
-            if (e.event.shiftKey) {
+            if (e.event.shiftKey || e.event.ctrlKey) {
                 container.timeline._timeline.range.options.moveable = false;
-                let endPointY;
+                let endPointY = e.y;
                 let endX = e.event.clientX;
                 let endY = e.event.clientY;
-                if (startX !== -10000 && startY !== -10000)
-                    this._drawRectangleWhenDraging(container, startX, startY, endX, endY);
                 endPointTime = e.time.getTime();
-                endPointY = e.y;
-                this._updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY);
+                if (startX !== -10000 && startY !== -10000) {
+                    this._drawRectangleWhenDragging(container, startX, startY, endX, endY);
+                }
+                if (e.event.shiftKey)
+                    this._updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY);
             }
         });
 
         container.timeline._timeline.on("mouseUp", (e) => {
             let selectionElement = document.getElementById("selection");
             selectionElement.style.display = "none";
-            if (!container.timeline._timeline.range.options.moveable)
-                container.timeline._timeline.range.options.moveable = true;
-            if (e.event.shiftKey) {
+            endPointTime = e.time.getTime();
+            if (!container.timeline._timeline.range.options.moveable) container.timeline._timeline.range.options.moveable = true;
 
-                endPointTime = e.time.getTime();
+            if (e.event.ctrlKey) {
+                if (window.vcftimeline.isMouseDown) {
+                    window.vcftimeline.isMouseDown = false;
+                    if (endPointTime < window.vcftimeline.startPointTime) {
+                        window.vcftimeline.endPointTime = window.vcftimeline.startPointTime;
+                        window.vcftimeline.startPointTime = endPointTime;
+                    } else {
+                        window.vcftimeline.endPointTime = endPointTime;
+                    }
+                    if (e.group) {
+                        container.$server.jsAddItem(window.vcftimeline.startPointTime, window.vcftimeline.endPointTime, e.group, true);
+                    }
+                }
+            }
+
+            if (e.event.shiftKey || e.event.ctrlKey) {
                 startPointTime = 0;
                 startPointY = -1000000;
                 startX = -10000;
@@ -258,8 +220,7 @@ window.vcftimeline = {
             let isResizing = isResizingRight !== isResizingLeft;
             if (isDragging) {
                 let multiple = false;
-                if (container.timeline._timeline.itemSet.touchParams.itemProps)
-                    multiple = container.timeline._timeline.itemSet.touchParams.itemProps.length > 1;
+                if (container.timeline._timeline.itemSet.touchParams.itemProps) multiple = container.timeline._timeline.itemSet.touchParams.itemProps.length > 1;
                 let itemsInitialXMap = null;
                 let selectedItems = null;
                 if (multiple) {
@@ -278,8 +239,8 @@ window.vcftimeline = {
                 let mouseAtLeftOfCenter = mouseX < centerOfTimelineInPixels;
                 let widthInMilliseconds = range.end.valueOf() - range.start.valueOf();
 
-                // handle autoscrolling when moving, not resizing
-                if (mouseAtLeftOfCenter && item.data.start <= range.start && (options.min == undefined || range.start > new Date(options.min)) && !isResizing) {
+                // handle autoscaling when moving, not resizing
+                if (mouseAtLeftOfCenter && item.data.start <= range.start && (options.min === undefined || range.start > new Date(options.min)) && !isResizing) {
                     window.vcftimeline._moveWindowToRight(container, range, widthInMilliseconds);
                     if (multiple) {
                         container.timeline._timeline.itemSet.touchParams.itemProps.forEach((ip) => {
@@ -287,16 +248,17 @@ window.vcftimeline = {
                             let initialXValue = itemsInitialXMap.get(id);
                             ip.initialX = initialXValue + widthInPixels / 50;
                         });
-                        selectedItems.forEach((selectedItem) => {
-                            selectedItem.data.start = new Date(selectedItem.data.start.valueOf() - widthInMilliseconds / 50);
-                            selectedItem.data.end = new Date(selectedItem.data.end.valueOf() - widthInMilliseconds / 50);
-                        });
+                        if (selectedItems)
+                            selectedItems.forEach((selectedItem) => {
+                                selectedItem.data.start = new Date(selectedItem.data.start.valueOf() - widthInMilliseconds / 50);
+                                selectedItem.data.end = new Date(selectedItem.data.end.valueOf() - widthInMilliseconds / 50);
+                            });
                     } else {
                         container.timeline._timeline.itemSet.touchParams.itemProps[0].initialX = ix + widthInPixels / 50;
                         item.data.start = new Date(item.data.start.valueOf() - widthInMilliseconds / 50);
                         item.data.end = new Date(item.data.end.valueOf() - widthInMilliseconds / 50);
                     }
-                } else if (!mouseAtLeftOfCenter && item.data.end >= range.end && (options.max == undefined || range.end < new Date(options.max)) && !isResizing) {
+                } else if (!mouseAtLeftOfCenter && item.data.end >= range.end && (options.max === undefined || range.end < new Date(options.max)) && !isResizing) {
                     window.vcftimeline._moveWindowToLeft(container, range, widthInMilliseconds);
                     if (multiple) {
                         container.timeline._timeline.itemSet.touchParams.itemProps.forEach((ip) => {
@@ -304,10 +266,11 @@ window.vcftimeline = {
                             let initialXValue = itemsInitialXMap.get(id);
                             ip.initialX = initialXValue - widthInPixels / 50;
                         });
-                        selectedItems.forEach((selectedItem) => {
-                            selectedItem.data.start = new Date(selectedItem.data.start.valueOf() + widthInMilliseconds / 50);
-                            selectedItem.data.end = new Date(selectedItem.data.end.valueOf() + widthInMilliseconds / 50);
-                        });
+                        if (selectedItems)
+                            selectedItems.forEach((selectedItem) => {
+                                selectedItem.data.start = new Date(selectedItem.data.start.valueOf() + widthInMilliseconds / 50);
+                                selectedItem.data.end = new Date(selectedItem.data.end.valueOf() + widthInMilliseconds / 50);
+                            });
                     } else {
                         container.timeline._timeline.itemSet.touchParams.itemProps[0].initialX = ix - widthInPixels / 50;
                         item.data.start = new Date(item.data.start.valueOf() + widthInMilliseconds / 50);
@@ -316,25 +279,25 @@ window.vcftimeline = {
                 }
 
                 // auto scroll to left when resizing left
-                if (item.data.start <= range.start && (options.min == undefined || range.start > new Date(options.min)) && isResizingLeft) {
+                if (item.data.start <= range.start && (options.min === undefined || range.start > new Date(options.min)) && isResizingLeft) {
                     window.vcftimeline._moveWindowToRight(container, range, widthInMilliseconds, widthInPixels, ix);
                     item.data.start = new Date(item.data.start.valueOf() - widthInMilliseconds / 50);
                 }
 
                 // auto scroll to right when resizing left
-                if (item.data.start >= range.end && (options.max == undefined || range.end < new Date(options.max)) && isResizingLeft) {
+                if (item.data.start >= range.end && (options.max === undefined || range.end < new Date(options.max)) && isResizingLeft) {
                     window.vcftimeline._moveWindowToLeft(container, range, widthInMilliseconds, widthInPixels, ix);
                     item.data.start = new Date(item.data.start.valueOf() + widthInMilliseconds / 50);
                 }
 
                 // auto scroll to right when resizing right
-                if (item.data.end >= range.end && (options.max == undefined || range.end < new Date(options.max)) && isResizingRight) {
+                if (item.data.end >= range.end && (options.max === undefined || range.end < new Date(options.max)) && isResizingRight) {
                     window.vcftimeline._moveWindowToLeft(container, range, widthInMilliseconds, widthInPixels, ix);
                     item.data.end = new Date(item.data.end.valueOf() + widthInMilliseconds / 50);
                 }
 
                 // auto scroll to left when resizing right
-                if (item.data.end <= range.start && (options.min == undefined || range.start > new Date(options.min)) && isResizingRight) {
+                if (item.data.end <= range.start && (options.min === undefined || range.start > new Date(options.min)) && isResizingRight) {
                     window.vcftimeline._moveWindowToRight(container, range, widthInMilliseconds, widthInPixels, ix);
                     item.data.end = new Date(item.data.end.valueOf() - widthInMilliseconds / 50);
                 }
@@ -344,41 +307,31 @@ window.vcftimeline = {
 
     _updateMultiSelectionByDragAndDrop(container, startPointTime, endPointTime, startPointY, endPointY) {
 
-        let itemset = container.timeline._timeline.itemSet;
+        let itemSet = container.timeline._timeline.itemSet;
         let itemIds = "";
-        let itemArray = Object.values(itemset.items);
+        let itemArray = Object.values(itemSet.items);
         let x0 = startPointTime < endPointTime ? startPointTime : endPointTime;
         let x1 = startPointTime > endPointTime ? startPointTime : endPointTime;
         let y0 = startPointY < endPointY ? startPointY : endPointY;
         let y1 = startPointY > endPointY ? startPointY : endPointY;
         for (let i = 0; i < itemArray.length; i++) {
-            let groupItemTemp = itemset.groups[itemArray[i].parent.groupId];
+            let groupItemTemp = itemSet.groups[itemArray[i].parent.groupId];
             let itemY = groupItemTemp.top + itemArray[i].top;
 
             let Ax0 = itemArray[i].data.start.getTime();
             let Ax1 = itemArray[i].data.end.getTime();
             let Ay0 = itemY;
             let Ay1 = itemY + itemArray[i].height;
-            if (startPointTime != 0)
-                if ((x0 <= Ax0 && x1 >= Ax0 && y0 <= Ay0 && y1 >= Ay0)
-                    || (x0 <= Ax0 && x1 >= Ax0 && y0 <= Ay1 && y1 >= Ay1)
-                    || (x0 <= Ax1 && x1 >= Ax1 && y0 <= Ay0 && y1 >= Ay0)
-                    || (x0 <= Ax1 && x1 >= Ax1 && y0 <= Ay1 && y1 >= Ay1)
-                    || (Ax0 <= x0 && Ax1 >= x0 && Ay0 <= y0 && Ay1 >= y0)
-                    || (Ax0 <= x0 && Ax1 >= x0 && Ay0 <= y1 && Ay1 >= y1)
-                    || (Ax0 <= x1 && Ax1 >= x1 && Ay0 <= y0 && Ay1 >= y0)
-                    || (Ax0 <= x1 && Ax1 >= x1 && Ay0 <= y1 && Ay1 >= y1)
-                    || (Ax0 <= x0 && Ax1 >= x1 && Ay0 >= y0 && Ay1 <= y1)
-                    || (Ax0 >= x0 && Ax1 <= x1 && Ay0 <= y0 && Ay1 >= y1))
-                    // if (x0 <= itemArray[i].data.start.getTime() && x1 >= itemArray[i].data.end.getTime()) {
-                    //
-                    //     if (y0 <= itemY && y1 >= itemY + itemArray[i].height) {
-                    if (itemIds == "") itemIds = itemArray[i].id.toString(); else itemIds += "," + itemArray[i].id.toString();
+            if (startPointTime !== 0) if ((x0 <= Ax0 && x1 >= Ax0 && y0 <= Ay0 && y1 >= Ay0) || (x0 <= Ax0 && x1 >= Ax0 && y0 <= Ay1 && y1 >= Ay1) || (x0 <= Ax1 && x1 >= Ax1 && y0 <= Ay0 && y1 >= Ay0) || (x0 <= Ax1 && x1 >= Ax1 && y0 <= Ay1 && y1 >= Ay1) || (Ax0 <= x0 && Ax1 >= x0 && Ay0 <= y0 && Ay1 >= y0) || (Ax0 <= x0 && Ax1 >= x0 && Ay0 <= y1 && Ay1 >= y1) || (Ax0 <= x1 && Ax1 >= x1 && Ay0 <= y0 && Ay1 >= y0) || (Ax0 <= x1 && Ax1 >= x1 && Ay0 <= y1 && Ay1 >= y1) || (Ax0 <= x0 && Ax1 >= x1 && Ay0 >= y0 && Ay1 <= y1) || (Ax0 >= x0 && Ax1 <= x1 && Ay0 <= y0 && Ay1 >= y1))
+                // if (x0 <= itemArray[i].data.start.getTime() && x1 >= itemArray[i].data.end.getTime()) {
+                //
+                //     if (y0 <= itemY && y1 >= itemY + itemArray[i].height) {
+                if (itemIds === "") itemIds = itemArray[i].id.toString(); else itemIds += "," + itemArray[i].id.toString();
             //     }
             //
             // }
         }
-        if (startPointTime != 0) container.$server.onSelect(itemIds);
+        if (startPointTime !== 0) container.$server.onSelect(itemIds);
         // this.onSelectItem(container, itemIds, false);
     },
 
@@ -431,7 +384,6 @@ window.vcftimeline = {
                 }
 
                 if (moveItem) {
-
                     callback(item);
                     let startDate = window.vcftimeline._convertDate(item.start);
                     let endDate = window.vcftimeline._convertDate(item.end);
@@ -445,10 +397,10 @@ window.vcftimeline = {
                 }
             },
 
-            snap: function (date, scale, step) {
-                let hour = snapStep * 60 * 1000;
-                return Math.round(date / hour) * hour;
-            },
+            // snap: function (date, scale, step) {
+            //     let hour = snapStep * 60 * 1000;
+            //     return Math.round(date / hour) * hour;
+            // },
         };
 
         let options = {};
@@ -461,12 +413,9 @@ window.vcftimeline = {
 
         if (tooltipOnItemUpdateTime) {
             (options.editable = {
-                add: true,
-                updateTime: true,
-                updateGroup: true,
-                remove: true,
-                overrideItems: false
-            }), (options.tooltipOnItemUpdateTime = {
+                add: true, updateTime: true, updateGroup: true, remove: true, overrideItems: false
+            });
+            (options.tooltipOnItemUpdateTime = {
                 template: function (item) {
                     let startDate = moment(item.start).format("MM/DD/YYYY HH:mm");
                     let endDate = moment(item.end).format("MM/DD/YYYY HH:mm");
@@ -506,22 +455,18 @@ window.vcftimeline = {
     addItem: function (container, newItemJson, autoZoom) {
         let parsedItem = JSON.parse(newItemJson);
         let item = {
-            id: Object.keys(container.timeline._timeline.itemSet.items).length,
+            id: parsedItem.id,
             group: Number.parseInt(parsedItem.group),
-            content: "item " + Object.keys(container.timeline._timeline.itemSet.items).length,
+            content: "new item",
             editable: {
-                add: true,
-                updateTime: true,
-                updateGroup: true,
-                remove: true,
-                overrideItems: false
+                add: true, updateTime: true, updateGroup: true, remove: true, overrideItems: false
             },
             selectable: true,
             start: parsedItem.start,
             end: parsedItem.end,
             type: 0,
         };
-        console.log("Item: ", container.timeline._timeline.itemsData);
+
         container.timeline._timeline.itemsData.add(item);
         if (autoZoom) {
             container.timeline._timeline.fit();
@@ -540,8 +485,7 @@ window.vcftimeline = {
         itemData.start = parsedItem.start;
         itemData.end = parsedItem.end;
 
-        container.timeline._timeline.itemSet.items[itemId].left =
-            container.timeline._timeline.itemSet.items[itemId].conversion.toScreen(moment(itemData.start));
+        container.timeline._timeline.itemSet.items[itemId].left = container.timeline._timeline.itemSet.items[itemId].conversion.toScreen(moment(itemData.start));
 
         container.timeline._timeline.itemsData.update(itemData);
     },
@@ -622,11 +566,10 @@ window.vcftimeline = {
     },
 
     _sortItems: function (items) {
-        let sortedItems = items.sort(function (item1, item2) {
+        return items.sort(function (item1, item2) {
             let item1_date = new Date(item1.start), item2_date = new Date(item2.start);
             return item1_date - item2_date;
         });
-        return sortedItems;
     },
 
     _createConnections: function (items) {
@@ -671,7 +614,8 @@ window.vcftimeline = {
             container.timeline._timeline.options.height = container.timelineHeight;
         }
     },
-    _drawRectangleWhenDraging: function (container, startX, startY, endX, endY) {
+
+    _drawRectangleWhenDragging: function (container, startX, startY, endX, endY) {
         let selectionElement = document.getElementById("selection");
         selectionElement.style.left = startX + "px";
         selectionElement.style.top = startY + "px";

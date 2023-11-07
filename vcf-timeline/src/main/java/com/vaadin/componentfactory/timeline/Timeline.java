@@ -136,8 +136,8 @@ public class Timeline extends Div {
      * @param item the new item to add to the timeline
      */
     public void addItem(Item item, boolean autoZoom) {
-        this.getElement().executeJs("vcftimeline.addItem($0, $1, $2)", this, item.toJSON(), autoZoom);
         this.items.add(item);
+        this.getElement().executeJs("vcftimeline.addItem($0, $1, $2)", this, item.toJSON(), autoZoom);
     }
 
     @ClientCallable
@@ -145,6 +145,8 @@ public class Timeline extends Div {
         LocalDateTime startDateTime = TimelineUtil.convertDateTime(start);
         LocalDateTime endDateTime = TimelineUtil.convertDateTime(end);
         Item item = new Item(startDateTime, endDateTime);
+        long milliseconds = Instant.now().toEpochMilli();
+        item.setId(group + "_" + milliseconds);
         if (group != null)
             item.setGroup(group);
         addItem(item, autoZoom);

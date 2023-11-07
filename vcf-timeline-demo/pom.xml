@@ -157,7 +157,7 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>11.0.15</version>
                 <configuration>
-                    <scanIntervalSeconds>-1</scanIntervalSeconds>
+                    <scanInterval>-1</scanInterval>
                     <stopKey>${project.artifactId}</stopKey>
                     <stopPort>8081</stopPort>
                 </configuration>
