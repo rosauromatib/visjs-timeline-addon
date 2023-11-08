@@ -129,12 +129,25 @@ window.vcftimeline = {
             container.$server.onSelect(temp.replace(" ", ""));
         });
 
+        let justClicked = false;
+
+        // container.timeline._timeline.on('click', function (properties) {
+        //     console.log("properties: ", properties);
+        //     if (properties.what === 'item') {
+        //         justClicked = true;
+        //         setTimeout(function () {
+        //             justClicked = false;
+        //         }, 500); // reset the flag after 500ms
+        //     }
+        // });
+
         container.timeline._timeline.on('doubleClick', function (properties) {
-            var clickedItem = properties.item;
-            if (clickedItem) {
-                var itemData = container.timeline._timeline.itemsData.get(clickedItem);
+            if (properties.what === 'item') {
+                let itemData = container.timeline._timeline.itemsData.get(properties.item);
                 itemData.content = '<input>' + itemData.content;
-                container.timeline._timeline.itemsData.update(itemData);
+                container.timeline._timeline.itemsData.remove(itemData.id);
+                itemData.editing = true;
+                container.timeline._timeline.itemsData.add(itemData);
             }
         });
 
@@ -414,14 +427,27 @@ window.vcftimeline = {
                 container.$server.onRemove(item.id);
             },
             template: function (item, element, data) {
-                if (data.content.startsWith('<input')) {
+                if (item.editing && data.content.startsWith('<input')) {
                     var inputElement = document.createElement('input');
+                    inputElement.style.width = '100%';
                     inputElement.value = data.content.replace('<input>', '');
                     inputElement.onblur = function () {
                         data.content = inputElement.value;
-                        container.timeline._timeline.itemsData.update(data);
+                        item.editing = false;
+                        setTimeout(() => container.timeline._timeline.itemsData.update(data), 0);
+                        // container.timeline._timeline.itemsData.update(data);
                     };
-                    setTimeout(() => inputElement.focus(), 0);
+                    inputElement.onkeydown = function (event) {
+                        if (event.key === 'Enter' || event.key === 'Escape') {
+                            // If Enter was pressed, update the item content
+                            if (event.key === 'Enter') {
+                                item.content = inputElement.value;
+                            }
+                            item.editing = false;
+                            container.timeline._timeline.itemSet.itemsData.update(item);
+                        }
+                    };
+                    setTimeout(() => inputElement.focus(), 300);
                     return inputElement;
                 } else {
                     return data.content;
@@ -652,6 +678,5 @@ window.vcftimeline = {
             selectionElement.style.left = (endX < startX) ? (startX - width) + "px" : startX + "px";
             selectionElement.style.top = (endY < startY) ? (startY - height) + "px" : startY + "px";
         }
-
     },
 };
