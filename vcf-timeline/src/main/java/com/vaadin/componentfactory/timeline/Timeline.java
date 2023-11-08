@@ -631,6 +631,9 @@ public class Timeline extends Div {
         this.getElement().executeJs("vcftimeline.removeItem($0, $1)", this, item.getId());
     }
 
+    public void removeItem(String itemId) {
+        this.getElement().executeJs("vcftimeline.removeItem($0, $1)", this, itemId);
+    }
     /**
      * Call from client when an item is removed.
      *

@@ -103,31 +103,39 @@ window.vcftimeline = {
         container.timeline = new Arrow(timeline, bGroup);
 
         let group = null;
-        let bodyClicked = false;
-
+        let selectedItems = [];
 
         container.timeline._timeline.on("select", (properties) => {
             if (!properties.items || properties.items.length === 0)
                 return;
-            let temp = properties.items.toString();
 
+            let itemSet = container.timeline._timeline.itemSet;
+            let clickedGroup = itemSet.groupFromTarget(properties.event);
+            if (clickedGroup) {
+                selectedItems = properties.items;
+                let allGroups = groupItems.get();
+                for (let group of allGroups) {
+                    if (group.id !== clickedGroup.groupId) {
+                        group.className = "vis-group-unselected"; // Replace 'old-class-name' with the actual class name
+                        groupItems.update(group);
+                    }
+                    else{
+                        group.className = "vis-group-selected";
+                        groupItems.update(group);
+                    }
+                }
+            }
+
+            let temp = properties.items.toString();
             container.$server.onSelect(temp.replace(" ", ""));
         });
 
-        container.timeline._timeline.on("tap", (properties) => {
-            let targetEle = properties.firstTarget.classList.value;
-            if (bGroup) {
-                if (!(targetEle.includes("vis-label") || targetEle.includes("vis-inner"))) {
-                    let itemSet = container.timeline._timeline.itemSet;
-                    let tempGroup = itemSet.groupFromTarget(properties);
-                    if (tempGroup) {
-                        let group = itemSet.groupsData.get(tempGroup.groupId);
-
-                        bodyClicked = true;
-
-                        this._updateGroupClassName(container, group, "vis-group-selected");
-                    }
-                }
+        container.timeline._timeline.on('doubleClick', function (properties) {
+            var clickedItem = properties.item;
+            if (clickedItem) {
+                var itemData = container.timeline._timeline.itemsData.get(clickedItem);
+                itemData.content = '<input>' + itemData.content;
+                container.timeline._timeline.itemsData.update(itemData);
             }
         });
 
@@ -141,6 +149,7 @@ window.vcftimeline = {
         });
 
         container.timeline._timeline.on("changed", () => {
+            container.timeline._timeline.setSelection(selectedItems);
             this._updateConnections(container, false);
             this._updateTimelineHeight(container);
         });
@@ -401,7 +410,26 @@ window.vcftimeline = {
             //     let hour = snapStep * 60 * 1000;
             //     return Math.round(date / hour) * hour;
             // },
-        };
+            onRemove: function (item, callback) {
+                console.log("item: ", item);
+                console.log("callback: ", callback);
+                container.$server.onRemove(item.id);
+            },
+            template: function (item, element, data) {
+                if (data.content.startsWith('<input')) {
+                    var inputElement = document.createElement('input');
+                    inputElement.value = data.content.replace('<input>', '');
+                    inputElement.onblur = function () {
+                        data.content = inputElement.value;
+                        container.timeline._timeline.itemsData.update(data);
+                    };
+                    setTimeout(() => inputElement.focus(), 0);
+                    return inputElement;
+                } else {
+                    return data.content;
+                }
+            }
+        }
 
         let options = {};
         Object.assign(options, parsedOptions, defaultOptions);
@@ -447,9 +475,6 @@ window.vcftimeline = {
     onSelectItem: function (container, onSelectItem, autoZoom) {
         let temp = onSelectItem.split(",");
         container.timeline._timeline.itemSet.setSelection(temp);
-        if (autoZoom) {
-            container.timeline._timeline.fit();
-        }
     },
 
     addItem: function (container, newItemJson, autoZoom) {
@@ -468,15 +493,11 @@ window.vcftimeline = {
         };
 
         container.timeline._timeline.itemsData.add(item);
-        if (autoZoom) {
-            container.timeline._timeline.fit();
-        }
     },
 
     setItems: function (container, itemsJson, autoZoom) {
         let items = new DataSet(JSON.parse(itemsJson));
         container.timeline._timeline.setItems(items);
-        if (autoZoom) container.timeline._timeline.fit();
     },
 
     revertMove: function (container, itemId, itemJson) {
@@ -485,14 +506,13 @@ window.vcftimeline = {
         itemData.start = parsedItem.start;
         itemData.end = parsedItem.end;
 
-        container.timeline._timeline.itemSet.items[itemId].left = container.timeline._timeline.itemSet.items[itemId].conversion.toScreen(moment(itemData.start));
-
+        container.timeline._timeline.itemSet.items[itemId].left =
+            container.timeline._timeline.itemSet.items[itemId].conversion.toScreen(moment(itemData.start));
         container.timeline._timeline.itemsData.update(itemData);
     },
 
     removeItem: function (container, itemId) {
         container.timeline._timeline.itemsData.remove(itemId);
-        container.$server.onRemove(itemId);
     },
 
     updateItemContent: function (container, itemId, newContent) {

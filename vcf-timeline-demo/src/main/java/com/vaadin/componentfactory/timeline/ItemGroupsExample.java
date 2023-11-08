@@ -178,6 +178,12 @@ public class ItemGroupsExample extends Div {
                 }
         );
 
+        timeline.addItemRemoveListener(
+                e -> {
+                    timeline.removeItem(e.getItemId());
+                }
+        );
+
         timeline.addGroupItemClickListener(e -> {
             StringBuilder temp = new StringBuilder();
             for (Item item : timeline.getItems()) {
