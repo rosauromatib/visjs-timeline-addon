@@ -118,8 +118,7 @@ window.vcftimeline = {
                     if (group.id !== clickedGroup.groupId) {
                         group.className = "vis-group-unselected"; // Replace 'old-class-name' with the actual class name
                         groupItems.update(group);
-                    }
-                    else{
+                    } else {
                         group.className = "vis-group-selected";
                         groupItems.update(group);
                     }
@@ -149,7 +148,7 @@ window.vcftimeline = {
         });
 
         container.timeline._timeline.on("changed", () => {
-            container.timeline._timeline.setSelection(selectedItems);
+            // container.timeline._timeline.setSelection(selectedItems);
             this._updateConnections(container, false);
             this._updateTimelineHeight(container);
         });
@@ -176,7 +175,7 @@ window.vcftimeline = {
 
         container.timeline._timeline.on('mouseMove', (e) => {
             mouseX = e.event.clientX;
-            if (e.event.shiftKey || e.event.ctrlKey) {
+            if ((e.event.shiftKey || e.event.ctrlKey) && window.vcftimeline.isMouseDown) {
                 container.timeline._timeline.range.options.moveable = false;
                 let endPointY = e.y;
                 let endX = e.event.clientX;
@@ -198,7 +197,6 @@ window.vcftimeline = {
 
             if (e.event.ctrlKey) {
                 if (window.vcftimeline.isMouseDown) {
-                    window.vcftimeline.isMouseDown = false;
                     if (endPointTime < window.vcftimeline.startPointTime) {
                         window.vcftimeline.endPointTime = window.vcftimeline.startPointTime;
                         window.vcftimeline.startPointTime = endPointTime;
@@ -212,6 +210,7 @@ window.vcftimeline = {
             }
 
             if (e.event.shiftKey || e.event.ctrlKey) {
+                window.vcftimeline.isMouseDown = false;
                 startPointTime = 0;
                 startPointY = -1000000;
                 startX = -10000;
@@ -331,11 +330,12 @@ window.vcftimeline = {
             let Ax1 = itemArray[i].data.end.getTime();
             let Ay0 = itemY;
             let Ay1 = itemY + itemArray[i].height;
-            if (startPointTime !== 0) if ((x0 <= Ax0 && x1 >= Ax0 && y0 <= Ay0 && y1 >= Ay0) || (x0 <= Ax0 && x1 >= Ax0 && y0 <= Ay1 && y1 >= Ay1) || (x0 <= Ax1 && x1 >= Ax1 && y0 <= Ay0 && y1 >= Ay0) || (x0 <= Ax1 && x1 >= Ax1 && y0 <= Ay1 && y1 >= Ay1) || (Ax0 <= x0 && Ax1 >= x0 && Ay0 <= y0 && Ay1 >= y0) || (Ax0 <= x0 && Ax1 >= x0 && Ay0 <= y1 && Ay1 >= y1) || (Ax0 <= x1 && Ax1 >= x1 && Ay0 <= y0 && Ay1 >= y0) || (Ax0 <= x1 && Ax1 >= x1 && Ay0 <= y1 && Ay1 >= y1) || (Ax0 <= x0 && Ax1 >= x1 && Ay0 >= y0 && Ay1 <= y1) || (Ax0 >= x0 && Ax1 <= x1 && Ay0 <= y0 && Ay1 >= y1))
-                // if (x0 <= itemArray[i].data.start.getTime() && x1 >= itemArray[i].data.end.getTime()) {
-                //
-                //     if (y0 <= itemY && y1 >= itemY + itemArray[i].height) {
-                if (itemIds === "") itemIds = itemArray[i].id.toString(); else itemIds += "," + itemArray[i].id.toString();
+            if (startPointTime !== 0)
+                if ((x0 <= Ax0 && x1 >= Ax0 && y0 <= Ay0 && y1 >= Ay0) || (x0 <= Ax0 && x1 >= Ax0 && y0 <= Ay1 && y1 >= Ay1) || (x0 <= Ax1 && x1 >= Ax1 && y0 <= Ay0 && y1 >= Ay0) || (x0 <= Ax1 && x1 >= Ax1 && y0 <= Ay1 && y1 >= Ay1) || (Ax0 <= x0 && Ax1 >= x0 && Ay0 <= y0 && Ay1 >= y0) || (Ax0 <= x0 && Ax1 >= x0 && Ay0 <= y1 && Ay1 >= y1) || (Ax0 <= x1 && Ax1 >= x1 && Ay0 <= y0 && Ay1 >= y0) || (Ax0 <= x1 && Ax1 >= x1 && Ay0 <= y1 && Ay1 >= y1) || (Ax0 <= x0 && Ax1 >= x1 && Ay0 >= y0 && Ay1 <= y1) || (Ax0 >= x0 && Ax1 <= x1 && Ay0 <= y0 && Ay1 >= y1))
+                    // if (x0 <= itemArray[i].data.start.getTime() && x1 >= itemArray[i].data.end.getTime()) {
+                    //
+                    //     if (y0 <= itemY && y1 >= itemY + itemArray[i].height) {
+                    if (itemIds === "") itemIds = itemArray[i].id.toString(); else itemIds += "," + itemArray[i].id.toString();
             //     }
             //
             // }
@@ -411,8 +411,6 @@ window.vcftimeline = {
             //     return Math.round(date / hour) * hour;
             // },
             onRemove: function (item, callback) {
-                console.log("item: ", item);
-                console.log("callback: ", callback);
                 container.$server.onRemove(item.id);
             },
             template: function (item, element, data) {
@@ -474,7 +472,7 @@ window.vcftimeline = {
 
     onSelectItem: function (container, onSelectItem, autoZoom) {
         let temp = onSelectItem.split(",");
-        container.timeline._timeline.itemSet.setSelection(temp);
+        container.timeline._timeline.setSelection(temp);
     },
 
     addItem: function (container, newItemJson, autoZoom) {
