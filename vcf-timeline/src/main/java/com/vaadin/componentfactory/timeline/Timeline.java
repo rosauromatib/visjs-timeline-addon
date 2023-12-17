@@ -35,7 +35,6 @@ import com.vaadin.flow.internal.Pair;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -137,6 +136,11 @@ public class Timeline extends Div {
      */
     public void addItem(Item item, boolean autoZoom) {
         this.items.add(item);
+        ItemAddEvent event = new ItemAddEvent(this, item, true);
+        try {
+            fireEvent(event);
+        } catch (RuntimeException ignored) {
+        }
         this.getElement().executeJs("vcftimeline.addItem($0, $1, $2)", this, item.toJSON(), autoZoom);
     }
 
@@ -634,6 +638,7 @@ public class Timeline extends Div {
     public void removeItem(String itemId) {
         this.getElement().executeJs("vcftimeline.removeItem($0, $1)", this, itemId);
     }
+
     /**
      * Call from client when an item is removed.
      *
@@ -738,6 +743,9 @@ public class Timeline extends Div {
         addListener(GroupItemSelectEvent.class, listener);
     }
 
+    public void addItemAddListener(ComponentEventListener<ItemAddEvent> listener) {
+        addListener(ItemAddEvent.class, listener);
+    }
 
 //  /**
 //   * Adds a listener for {@link ItemsSelectEvent} to the component.
