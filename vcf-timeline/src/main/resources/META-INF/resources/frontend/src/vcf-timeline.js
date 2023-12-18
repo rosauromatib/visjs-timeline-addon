@@ -434,6 +434,7 @@ window.vcftimeline = {
                     inputElement.onblur = function () {
                         data.content = inputElement.value;
                         item.editing = false;
+                        container.$server.updateItemTitle(data);
                         setTimeout(() => container.timeline._timeline.itemsData.update(data), 0);
                         // container.timeline._timeline.itemsData.update(data);
                     };

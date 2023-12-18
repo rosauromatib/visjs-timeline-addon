@@ -31,6 +31,7 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.internal.Pair;
+import elemental.json.JsonObject;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -394,6 +395,27 @@ public class Timeline extends Div {
         updateTimelineOptions();
     }
 
+    @ClientCallable
+    public void updateItemTitle(JsonObject eventData) {
+        Item item = new Item();
+        item.setId(eventData.getString("id"));
+        item.setGroup(eventData.getString("group"));
+        item.setTitle(eventData.getString("content"));
+        item.setStart(TimelineUtil.convertDateTime(eventData.getString("start")));
+        item.setEnd(TimelineUtil.convertDateTime(eventData.getString("end")));
+        item.setEditable(eventData.getBoolean("selectable"));
+        item.setClassName(eventData.getString("className"));
+
+        for (Item oneItem : this.items) {
+            if (oneItem.getId().equals(item.getId())) {
+                oneItem.setTitle(item.getTitle());
+                break;
+            }
+        }
+
+        this.fireItemUpdateTitle(item, true);
+    }
+
     /**
      * Sets zoom option for timeline.
      *
@@ -439,6 +461,18 @@ public class Timeline extends Div {
         } catch (RuntimeException e) {
             exception = e;
             event.setCancelled(true);
+        }
+    }//
+
+    protected void fireItemUpdateTitle(
+            Item item, boolean fromClient) {
+        ItemUpdateTitleEvent event = new ItemUpdateTitleEvent(this, item, fromClient);
+        RuntimeException exception = null;
+
+        try {
+            fireEvent(event);
+        } catch (RuntimeException e) {
+            exception = e;
         }
     }//
 
@@ -746,6 +780,10 @@ public class Timeline extends Div {
 
     public void addItemAddListener(ComponentEventListener<ItemAddEvent> listener) {
         addListener(ItemAddEvent.class, listener);
+    }
+
+    public void addItemUpdateTitle(ComponentEventListener<ItemUpdateTitleEvent> listener) {
+        addListener(ItemUpdateTitleEvent.class, listener);
     }
 
 //  /**
