@@ -404,7 +404,8 @@ public class Timeline extends Div {
         item.setStart(TimelineUtil.convertDateTimeFromString(eventData.getString("start")));
         item.setEnd(TimelineUtil.convertDateTimeFromString(eventData.getString("end")));
         item.setEditable(eventData.getBoolean("selectable"));
-        item.setClassName(eventData.getString("className"));
+        if (eventData.hasKey("className"))
+            item.setClassName(eventData.getString("className"));
 
         for (Item oneItem : this.items) {
             if (oneItem.getId().equals(item.getId())) {
