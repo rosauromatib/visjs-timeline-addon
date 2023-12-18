@@ -149,6 +149,7 @@ public class Timeline extends Div {
         LocalDateTime startDateTime = TimelineUtil.convertDateTime(start);
         LocalDateTime endDateTime = TimelineUtil.convertDateTime(end);
         Item item = new Item(startDateTime, endDateTime);
+        item.setTitle("new item");
         long milliseconds = Instant.now().toEpochMilli();
         item.setId(group + "_" + milliseconds);
         if (group != null)
