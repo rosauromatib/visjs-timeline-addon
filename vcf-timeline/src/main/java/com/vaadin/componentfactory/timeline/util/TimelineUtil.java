@@ -39,6 +39,14 @@ public class TimelineUtil {
         return LocalDateTime.ofInstant(date, ZoneId.systemDefault());
     }
 
+    public static LocalDateTime convertDateTimeFromString(String strDateTime) {
+        if (strDateTime == null)
+            return null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        LocalDateTime dateTime = LocalDateTime.parse(strDateTime, formatter);
+        return dateTime;
+    }
+
     public static String formatDates(LocalDateTime date) {
         return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     }

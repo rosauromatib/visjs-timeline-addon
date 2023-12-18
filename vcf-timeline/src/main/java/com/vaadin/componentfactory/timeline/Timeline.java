@@ -401,8 +401,8 @@ public class Timeline extends Div {
         item.setId(eventData.getString("id"));
         item.setGroup(eventData.getString("group"));
         item.setTitle(eventData.getString("content"));
-        item.setStart(TimelineUtil.convertDateTime(eventData.getString("start")));
-        item.setEnd(TimelineUtil.convertDateTime(eventData.getString("end")));
+        item.setStart(TimelineUtil.convertDateTimeFromString(eventData.getString("start")));
+        item.setEnd(TimelineUtil.convertDateTimeFromString(eventData.getString("end")));
         item.setEditable(eventData.getBoolean("selectable"));
         item.setClassName(eventData.getString("className"));
 
