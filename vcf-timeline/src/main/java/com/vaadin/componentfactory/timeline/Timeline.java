@@ -736,14 +736,10 @@ public class Timeline extends Div {
     }
 
     public void onSelectItems(Timeline container, String selectedItemsIds, boolean autoZoom) {
-//    if(this.getElement().getNode().isAttached()) {
-//        List<String> temp = new ArrayList<>();
-//        temp = Arrays.asList("0", "4");
         this.getElement()
                 .executeJs(
                         "vcftimeline.onSelectItem($0, $1, $2, $3)",
                         container, selectedItemsIds, autoZoom);
-//    }
         updateTimelineOptions();
     }
 
@@ -756,7 +752,6 @@ public class Timeline extends Div {
                 .executeJs(
                         "vcftimeline.setHighlightRange($0, $1, $2)",
                         container, Long.toString(startStamp), Long.toString(endStamp));
-//        updateTimelineOptions();
     }
 
     public void onSetFocusSelectionByDragAndDrop(Timeline container, boolean bFocus) {
@@ -786,15 +781,6 @@ public class Timeline extends Div {
     public void addItemUpdateTitle(ComponentEventListener<ItemUpdateTitleEvent> listener) {
         addListener(ItemUpdateTitleEvent.class, listener);
     }
-
-//  /**
-//   * Adds a listener for {@link ItemsSelectEvent} to the component.
-//   *
-//   * @param listener the listener to be added
-//   */
-//  public void addItemsDragAndDropListener(ComponentEventListener<ItemsDragAndDropEvent> listener) {
-//    addListener(ItemsDragAndDropEvent.class, listener);
-//  }
 
     /**
      * Sets whether tooltip should be displayed while updating an item.
@@ -831,5 +817,4 @@ public class Timeline extends Div {
         getTimelineOptions().tooltipOnItemUpdateTimeTemplate = template;
         updateTimelineOptions();
     }
-
 }

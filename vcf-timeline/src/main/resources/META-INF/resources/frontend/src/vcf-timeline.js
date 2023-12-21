@@ -88,15 +88,6 @@ window.vcftimeline = {
         // Create Timeline
         let timeline;
         if (bGroup) {
-            // let startDay = moment().startOf("month").startOf("week").isoWeekday(1);
-            // let options1 = {
-            //     start: startDay.toDate(),
-            //     end: new Date(1000 * 60 * 60 * 24 + new Date().valueOf()),
-            //     horizontalScroll: true,
-            //     zoomKey: "ctrlKey",
-            //     orientation: "both",
-            //     zoomMin: 1000 * 60 * 60 * 240,
-            // };
             timeline = new Timeline(container, items, groupItems, options);
         } else timeline = new Timeline(container, items, options);
 
@@ -109,8 +100,7 @@ window.vcftimeline = {
             if (!properties.items || properties.items.length === 0)
                 return;
 
-            let itemSet = container.timeline._timeline.itemSet;
-            let clickedGroup = itemSet.groupFromTarget(properties.event);
+            let clickedGroup = container.timeline._timeline.itemSet.groupFromTarget(properties.event);
             if (clickedGroup) {
                 selectedItems = properties.items;
                 let allGroups = groupItems.get();
@@ -128,18 +118,6 @@ window.vcftimeline = {
             let temp = properties.items.toString();
             container.$server.onSelect(temp.replace(" ", ""));
         });
-
-        let justClicked = false;
-
-        // container.timeline._timeline.on('click', function (properties) {
-        //     console.log("properties: ", properties);
-        //     if (properties.what === 'item') {
-        //         justClicked = true;
-        //         setTimeout(function () {
-        //             justClicked = false;
-        //         }, 500); // reset the flag after 500ms
-        //     }
-        // });
 
         container.timeline._timeline.on('doubleClick', function (properties) {
             if (properties.what === 'item') {
@@ -161,7 +139,6 @@ window.vcftimeline = {
         });
 
         container.timeline._timeline.on("changed", () => {
-            // container.timeline._timeline.setSelection(selectedItems);
             this._updateConnections(container, false);
             this._updateTimelineHeight(container);
         });
@@ -176,9 +153,6 @@ window.vcftimeline = {
             startX = e.event.x;
             startY = e.event.y;
             if (e.event.shiftKey || e.event.ctrlKey) {
-                // let startPointTime = e.time.getTime();
-                // if (e.group) group = e.group;
-                // container.$server.jsAddItem(startPointTime, startPointTime + 2000000, e.group.toString(), true);
                 container.timeline._timeline.range.options.moveable = false;
                 container.timeline._timeline.touch.allowDragging = false;
                 window.vcftimeline.startPointTime = startPointTime;
@@ -243,7 +217,7 @@ window.vcftimeline = {
                 let multiple = false;
                 if (container.timeline._timeline.itemSet.touchParams.itemProps) multiple = container.timeline._timeline.itemSet.touchParams.itemProps.length > 1;
                 let itemsInitialXMap = null;
-                let selectedItems = null;
+                selectedItems = null;
                 if (multiple) {
                     itemsInitialXMap = new Map();
                     container.timeline._timeline.itemSet.touchParams.itemProps.forEach((obj) => {
@@ -381,7 +355,6 @@ window.vcftimeline = {
     _processOptions: function (container, optionsJson) {
         let parsedOptions = JSON.parse(optionsJson);
 
-        let snapStep = parsedOptions.snapStep;
         delete parsedOptions.snapStep;
 
         let autoZoom = parsedOptions.autoZoom;
